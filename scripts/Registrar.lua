@@ -24,7 +24,9 @@ Components.register {
   -- The carrier of this component receives any items they reveal when
   -- they use the stairs to leave the floor.
   NixsChars_descentCollectItems = {
-    Components.field.bool("active", true)
+    Components.field.bool("active", true),
+    Components.field.entityID("randomizer"),
+    Components.field.table("revealedItems", {})
   },
 
   -- This component is given to any item.
@@ -48,12 +50,23 @@ Components.register {
   }
 }
 
+CustomEntities.register {
+  name = "NixsChars_Randomizer",
+  random = {}
+}
+
 CustomEntities.extend {
   template = CustomEntities.template.player(0),
   name = "NixsChars_Lola",
   components = {
     NixsChars_descentCollectItems = {},
     NixsChars_forcedLowPercent = {},
+    forceNonSilhouetteVision = {
+      component = "storage"
+    },
+    forceObjectVision = {
+      component = "storage"
+    },
     friendlyName = {
       name = "Lola"
     },
@@ -68,6 +81,9 @@ CustomEntities.extend {
       components = {
         itemGrantContentsVision = ItemBan.Type.FULL
       }
+    },
+    minimapVision = {
+      component = "storage"
     },
     playableCharacter = {
       lobbyOrder = -2370

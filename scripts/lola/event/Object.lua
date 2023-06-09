@@ -6,7 +6,27 @@ local Event        = require "necro.event.Event"
 local GameDLC      = require "necro.game.data.resource.GameDLC"
 local Inventory    = require "necro.game.item.Inventory"
 local ItemPickup   = require "necro.game.item.ItemPickup"
+local LowPercent   = require "necro.game.item.LowPercent"
 local Object       = require "necro.game.object.Object"
+local RNG          = require "necro.game.system.RNG"
+local Utilities    = require "system.utils.Utilities"
+
+local RevealedItems = require "NixsChars.mod.RevealedItems"
+
+local function channel(player)
+  if GameDLC.isSynchronyLoaded() and player.Sync_possessable then
+    player = Entities.getEntityByID(player.Sync_possessable.possessor)
+  end
+
+  local ent = player.NixsChars_descentCollectItems.randomizer
+
+  if ent == nil then
+    ent = Entities.spawn("NixsChars_Randomizer")
+    player.NixsChars_descentCollectItems.randomizer = ent
+  end
+
+  return ent
+end
 
 Event.objectInteract.add("lolaShrineDeath",
   { order = "lowPercent", filter = "interactableNegateLowPercent", sequence = -1 },
@@ -40,13 +60,13 @@ Event.objectInteract.add("lolaChestRevealer",
     local source = ev.interactor
     local target = ev.entity
 
-    print("Chest interact event")
+    -- print("Chest interact event")
 
     if CurrentLevel.isLobby() or ev.suppressed or not source.controllable or source.controllable.playerID == 0 then return end
 
     target.NixsChars_interactedBy.playerID = source.controllable.playerID
 
-    print(target.name .. " interacted by player " .. target.NixsChars_interactedBy.playerID)
+    -- print(target.name .. " interacted by player " .. target.NixsChars_interactedBy.playerID)
   end
 )
 
@@ -56,13 +76,13 @@ Event.objectTakeDamage.add("lolaCrateAttacker",
     local source = ev.attacker
     local target = ev.victim
 
-    print("Damage event")
+    -- print("Damage event")
 
     if CurrentLevel.isLobby() or ev.suppressed or not source.controllable or source.controllable.playerID == 0 then return end
 
     target.NixsChars_interactedBy.playerID = source.controllable.playerID
 
-    print(target.name .. " interacted by player " .. target.NixsChars_interactedBy.playerID)
+    -- print(target.name .. " interacted by player " .. target.NixsChars_interactedBy.playerID)
   end
 )
 
@@ -96,26 +116,84 @@ Event.objectTryCollectItem.add("lolaItemDeath",
   end
 )
 
-Event.objectDescentEnd.add("lolaPitfall",
-  { order = "collectItems", filter = "NixsChars_descentCollectItems", sequence = 1 },
+Event.objectDeath.add("lolaDoesntCollectOnDeath",
+  { order = "dead", filter = "NixsChars_descentCollectItems", sequence = 1 },
   function(ev)
-    if ev.type ~= Descent.Type.STAIRS then
-      ev.entity.NixsChars_descentCollectItems.active = false
-    end
+    ev.entity.NixsChars_descentCollectItems.active = false
   end
 )
 
-Event.storageDetach.add("lolaItemTracker", { order = "item", sequence = 1 },
+Event.objectDescentEnd.add("lolaPitfall",
+  { order = "collectItems", filter = "NixsChars_descentCollectItems", sequence = 1 },
   function(ev)
-    local container = ev.container
-    local entity = ev.entity
+    if CurrentLevel.isLobby() then return end
 
-    print("Storage detach event")
+    -- If not stairs, no collecting items.
+    if ev.type ~= Descent.Type.STAIRS then
+      ev.entity.NixsChars_descentCollectItems.active = false
+    end
 
-    if ev.suppressed or (not entity.itemNegateLowPercent) or container.NixsChars_interactedBy.playerID == 0 then return end
+    -- Also, if this is the last one to exit, we should collect items and
+    -- check Low%s.
+    if ev.exitRequirementMet then
+      -- Iterate all controllable entities with
+      -- NixsChars_descentCollectItems. Disable any
+      -- NixsChars_forcedLowPercent they may have, then collect their
+      -- listed items, before re-enabling.
+      for e in Entities.entitiesWithComponents { "NixsChars_descentCollectItems", "controllable" } do
+        local singleChoices = {}
 
-    entity.NixsChars_revealedBy.playerID = container.NixsChars_interactedBy.playerID
+        if e.NixsChars_descentCollectItems.active then
+          local holster = nil
 
-    print(entity.name .. " revealed by player " .. container.NixsChars_interactedBy.playerID)
+          -- Search for holsters
+          -- caching them saves some computations later
+          for i, v in ipairs(Inventory.getItems(e)) do
+            if v.itemHolster then
+              holster = v
+            end
+          end
+
+          if e.NixsChars_forcedLowPercent then
+            e.NixsChars_forcedLowPercent.active = false
+          end
+
+          for i, itm in ipairs(RevealedItems.getRevealedItems(e)) do
+            print(itm)
+
+            if e.itemSlot then
+              local slot = e.itemSlot.name
+              if not Inventory.hasSlotCapacity(e, slot, 1)
+                  and holster
+                  and holster.itemHolster.slot == slot then
+                Inventory.swapWithHolster(e, holster)
+              end
+            end
+
+            local sc = itm.item.singleChoice
+            if sc == 0 then
+              Inventory.add(itm, e)
+              LowPercent.negate(e, itm)
+            else
+              local list = singleChoices[sc] or {}
+              table.insert(list, itm)
+              singleChoices[sc] = list
+            end
+          end
+
+          for k, v in Utilities.sortedPairs(singleChoices) do
+            local itm = RNG.choice(v, channel(e))
+            Inventory.add(itm, e)
+            LowPercent.negate(e, itm)
+          end
+
+          if e.NixsChars_forcedLowPercent then
+            e.NixsChars_forcedLowPercent.active = true
+          end
+        else
+          e.NixsChars_descentCollectItems.active = true
+        end
+      end
+    end
   end
 )

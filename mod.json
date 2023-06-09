@@ -1,7 +1,7 @@
 {
 	"namespace": "NixsChars",
 	"displayName": "Nix's Characters",
-	"version": "1.0.0",
+	"version": "1.0.3",
 	"synchronyVersion": "3.7.1",
 	"description": "Nix creates characters!",
 	"author": "Nixill",
@@ -15,6 +15,6 @@
 	"homepageURL": "https://mod.io/g/crypt/m/nixschars",
 	"modioID": "3064848",
 	"modioUserID": 12939888,
-	"pendingVersion": "1.0.0",
+	"pendingVersion": "1.0.3",
 	"visibility": 2
 }
