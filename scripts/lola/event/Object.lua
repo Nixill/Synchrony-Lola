@@ -124,12 +124,12 @@ Event.objectDeath.add("lolaDoesntCollectOnDeath",
 )
 
 Event.objectDescentEnd.add("lolaDescent",
-  { order = "collectItems", filter = "NixsChars_descentCollectItems", sequence = 1 },
+  { order = "collectItems", filter = "controllable", sequence = 1 },
   function(ev)
     if CurrentLevel.isLobby() then return end
 
     -- If not stairs, no collecting items.
-    if ev.type ~= Descent.Type.STAIRS then
+    if ev.type ~= Descent.Type.STAIRS and ev.entity.NixsChars_descentCollectItems then
       ev.entity.NixsChars_descentCollectItems.active = false
     end
 
