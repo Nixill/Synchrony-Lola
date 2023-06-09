@@ -123,7 +123,7 @@ Event.objectDeath.add("lolaDoesntCollectOnDeath",
   end
 )
 
-Event.objectDescentEnd.add("lolaPitfall",
+Event.objectDescentEnd.add("lolaDescent",
   { order = "collectItems", filter = "NixsChars_descentCollectItems", sequence = 1 },
   function(ev)
     if CurrentLevel.isLobby() then return end
@@ -159,22 +159,26 @@ Event.objectDescentEnd.add("lolaPitfall",
           end
 
           for i, itm in ipairs(RevealedItems.getRevealedItems(e)) do
-            print(itm)
-
-            if e.itemSlot then
-              local slot = e.itemSlot.name
-              if not Inventory.hasSlotCapacity(e, slot, 1)
-                  and holster
-                  and holster.itemHolster.slot == slot then
-                Inventory.swapWithHolster(e, holster)
-              end
-            end
+            print(itm.name)
+            print("Revealed by player #" .. itm.NixsChars_revealedBy.playerID)
 
             local sc = itm.item.singleChoice
             if sc == 0 then
+              if itm.itemSlot then
+                print("Holster swap initiated")
+                local slot = itm.itemSlot.name
+                if not Inventory.hasSlotCapacity(e, slot, 1)
+                    and holster
+                    and holster.itemHolster.slot == slot then
+                  Inventory.swapWithHolster(e, holster)
+                end
+              end
+
               Inventory.add(itm, e)
               LowPercent.negate(e, itm)
+              print("Item added!")
             else
+              print("Single-choice " .. sc .. " found, adding there!")
               local list = singleChoices[sc] or {}
               table.insert(list, itm)
               singleChoices[sc] = list
@@ -182,7 +186,20 @@ Event.objectDescentEnd.add("lolaPitfall",
           end
 
           for k, v in Utilities.sortedPairs(singleChoices) do
+            print("Single-choice:")
+            print(v)
             local itm = RNG.choice(v, channel(e))
+
+            if itm.itemSlot then
+              print("Holster swap initiated")
+              local slot = itm.itemSlot.name
+              if not Inventory.hasSlotCapacity(e, slot, 1)
+                  and holster
+                  and holster.itemHolster.slot == slot then
+                Inventory.swapWithHolster(e, holster)
+              end
+            end
+
             Inventory.add(itm, e)
             LowPercent.negate(e, itm)
           end
