@@ -5,7 +5,7 @@ local RevealedItems = require "NixsChars.mod.RevealedItems"
 Event.inventoryAddItem.add("lolaUntrack", { order = "unmap", sequence = 1 },
   function(ev)
     if ev.item.NixsChars_revealedBy then
-      ev.item.NixsChars_revealedBy.playerID = 0
+      RevealedItems.unmark(ev.item)
     end
   end
 )
