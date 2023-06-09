@@ -2,6 +2,14 @@ local Event = require "necro.event.Event"
 
 local RevealedItems = require "NixsChars.mod.RevealedItems"
 
+Event.inventoryAddItem.add("lolaUntrack", { order = "unmap", sequence = 1 },
+  function(ev)
+    if ev.item.NixsItems_revealedBy then
+      ev.item.NixsItems_revealedBy = 0
+    end
+  end
+)
+
 Event.itemConsume.add("lolaGlassShard", { order = "convert", sequence = 1 },
   function(ev)
     local drop = ev.droppedItem
