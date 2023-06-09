@@ -1,0 +1,20 @@
+{
+	"namespace": "NixsChars",
+	"displayName": "Nix's Characters",
+	"version": "1.0.0",
+	"synchronyVersion": "3.7.1",
+	"description": "Nix creates characters!",
+	"author": "Nixill",
+	"dependencies": {"PowerSettings_io_2237104":true},
+	"api": {"scriptPath":"scripts"},
+	"icon": "NixsCharsIcon.png",
+	"banner": "NixsCharsBanner.png",
+	"tags": [],
+	"name": "NixsChars_io_3064848",
+	"changelog": "",
+	"homepageURL": "https://mod.io/g/crypt/m/nixschars",
+	"modioID": "3064848",
+	"modioUserID": 12939888,
+	"pendingVersion": "1.0.0",
+	"visibility": 2
+}
