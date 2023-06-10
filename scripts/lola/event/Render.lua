@@ -23,8 +23,9 @@ Event.render.add("outlineClaimedItems", { order = "outlines", sequence = 1 },
       end
 
       if plr.lowPercent then
-        if plr.lowPercent.allowedItems[item.name]
-            and plr.NixsChars_forcedLowPercent then
+        if (plr.lowPercent.allowedItems[item.name]
+            and plr.NixsChars_forcedLowPercent)
+            or item.itemNegateLowPercent.active == false then
           color = Color.rgb(43, 66, 180) -- blue
         elseif item.NixsChars_revealedBy then
           if item.NixsChars_revealedBy.playerID == pid
