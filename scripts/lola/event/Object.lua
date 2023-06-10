@@ -159,13 +159,13 @@ Event.objectDescentEnd.add("lolaDescent",
           end
 
           for i, itm in ipairs(RevealedItems.getRevealedItems(e)) do
-            print(itm.name)
-            print("Revealed by player #" .. itm.NixsChars_revealedBy.playerID)
+            -- print(itm.name)
+            -- print("Revealed by player #" .. itm.NixsChars_revealedBy.playerID)
 
             local sc = itm.item.singleChoice
             if sc == 0 then
               if itm.itemSlot then
-                print("Holster swap initiated")
+                -- print("Holster swap initiated")
                 local slot = itm.itemSlot.name
                 if not Inventory.hasSlotCapacity(e, slot, 1)
                     and holster
@@ -176,9 +176,9 @@ Event.objectDescentEnd.add("lolaDescent",
 
               Inventory.add(itm, e)
               LowPercent.negate(e, itm)
-              print("Item added!")
+              -- print("Item added!")
             else
-              print("Single-choice " .. sc .. " found, adding there!")
+              -- print("Single-choice " .. sc .. " found, adding there!")
               local list = singleChoices[sc] or {}
               table.insert(list, itm)
               singleChoices[sc] = list
@@ -186,12 +186,12 @@ Event.objectDescentEnd.add("lolaDescent",
           end
 
           for k, v in Utilities.sortedPairs(singleChoices) do
-            print("Single-choice:")
-            print(v)
+            -- print("Single-choice:")
+            -- print(v)
             local itm = RNG.choice(v, channel(e))
 
             if itm.itemSlot then
-              print("Holster swap initiated")
+              -- print("Holster swap initiated")
               local slot = itm.itemSlot.name
               if not Inventory.hasSlotCapacity(e, slot, 1)
                   and holster
