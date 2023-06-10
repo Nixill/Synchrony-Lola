@@ -23,16 +23,19 @@ Event.render.add("outlineClaimedItems", { order = "outlines", sequence = 1 },
       end
 
       if plr.lowPercent then
-        if plr.lowPercent.allowedItems[item.name] then
+        if plr.lowPercent.allowedItems[item.name]
+            and plr.NixsChars_forcedLowPercent then
           color = Color.rgb(43, 66, 180) -- blue
         elseif item.NixsChars_revealedBy then
-          if item.NixsChars_revealedBy.playerID == pid then
+          if item.NixsChars_revealedBy.playerID == pid
+              and plr.NixsChars_descentCollectItems then
             if item.item.singleChoice == 0 then
               color = Color.rgb(66, 180, 43) -- green
             else
               color = Color.rgb(180, 157, 43) -- yellow
             end
-          elseif item.NixsChars_revealedBy.playerID ~= 0 then
+          elseif item.NixsChars_revealedBy.playerID ~= 0
+              and Player.getPlayerEntity(item.NixsChars_revealedBy.playerID).NixsChars_descentCollectItems then
             color = Color.rgb(150, 150, 150) -- silver
           end
         elseif not item.itemCurrency then
