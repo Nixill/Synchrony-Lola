@@ -7,6 +7,11 @@ local Player        = require "necro.game.character.Player"
 local PlayerList    = require "necro.client.PlayerList"
 local Render        = require "necro.render.Render"
 
+local BLUE   = Color.rgb(43, 66, 180)
+local GREEN  = Color.rgb(66, 180, 43)
+local SILVER = Color.rgb(150, 150, 150)
+local YELLOW = Color.rgb(180, 157, 43)
+
 Event.render.add("outlineClaimedItems", { order = "outlines", sequence = 1 },
   function(ev)
     if CurrentLevel.isLobby() then return end
@@ -23,24 +28,25 @@ Event.render.add("outlineClaimedItems", { order = "outlines", sequence = 1 },
       end
 
       if plr.lowPercent then
-        if (plr.lowPercent.allowedItems[item.name]
-            and plr.NixsChars_forcedLowPercent)
-            or item.itemNegateLowPercent.active == false then
-          color = Color.rgb(43, 66, 180) -- blue
+        if plr.lowPercent.allowedItems[item.name]
+            and plr.NixsChars_forcedLowPercent then
+          color = BLUE -- blue
         elseif item.NixsChars_revealedBy then
-          if item.NixsChars_revealedBy.playerID == pid
+          if not (item.itemNegateLowPercent and item.itemNegateLowPercent.active) then
+            color = BLUE -- blue
+          elseif item.NixsChars_revealedBy.playerID == pid
               and plr.NixsChars_descentCollectItems then
             if item.item.singleChoice == 0 then
-              color = Color.rgb(66, 180, 43) -- green
+              color = GREEN -- green
             else
-              color = Color.rgb(180, 157, 43) -- yellow
+              color = YELLOW -- yellow
             end
           elseif item.NixsChars_revealedBy.playerID ~= 0
               and Player.getPlayerEntity(item.NixsChars_revealedBy.playerID).NixsChars_descentCollectItems then
-            color = Color.rgb(150, 150, 150) -- silver
+            color = SILVER -- silver
           end
         elseif not item.itemCurrency then
-          color = Color.rgb(43, 66, 180) -- blue
+          color = BLUE -- blue
         end
       end
 
