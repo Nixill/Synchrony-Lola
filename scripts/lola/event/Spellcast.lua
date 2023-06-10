@@ -1,3 +1,4 @@
+local CurrentLevel   = require "necro.game.level.CurrentLevel"
 local Entities       = require "system.game.Entities"
 local Event          = require "necro.event.Event"
 local ItemStorage    = require "necro.game.item.ItemStorage"
@@ -15,6 +16,8 @@ local function getChestColor(itm)
 end
 
 local function packageItems(ev, greater)
+  if CurrentLevel.isLobby() then return end
+
   local package = nil
   local packageContents = {}
   local chestColor = nil

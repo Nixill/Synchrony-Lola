@@ -97,6 +97,8 @@ Event.objectTryCollectItem.add("lolaItemDeath",
         or not (source.NixsChars_forcedLowPercent.active
             and target.itemNegateLowPercent
             and target.itemNegateLowPercent.active)
+        or not source.lowPercent
+        or source.lowPercent.allowedItems[target.name]
     then return end
 
     ev.result = ItemPickup.Result.FAILURE
