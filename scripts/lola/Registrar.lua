@@ -154,7 +154,7 @@ CustomEntities.register {
     text = "Package"
   },
   spellcastTargetTiles = {
-    offsets = { { 1, 0 } }
+    offsets = { { 1, 0 }, { 0, -1 }, { 0, 1 }, { -1, 0 } }
   },
   spellcastUpgradable = {
     upgradeTypes = {
@@ -179,7 +179,7 @@ CustomEntities.register {
     text = "Greater Package"
   },
   spellcastTargetTiles = {
-    offsets = { { 1, 0 } }
+    offsets = { { 1, 0 }, { 0, -1 }, { 0, 1 }, { -1, 0 } }
   },
   spellcastUseFacingDirection = {},
 }

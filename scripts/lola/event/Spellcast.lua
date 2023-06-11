@@ -23,12 +23,19 @@ local function packageItems(ev, greater)
   local chestColor = nil
 
   -- What's the target tile?
-  local x = ev.tiles[1][1]
-  local y = ev.tiles[1][2]
+  local x = nil
+  local y = nil
 
   -- Iterate through any items on the tile to see what we can afford.
   for itm in SpellTargeting.targetsWithComponent(ev, "NixsChars_revealedBy") do
-    local collected = false
+    -- Make sure it's on the same tile (or a tile hasn't been set)
+    if x then
+      if itm.position.x ~= x or itm.position.y ~= y then return end
+    else
+      x = itm.position.x
+      y = itm.position.y
+    end
+
     -- Is there a price tag?
     if itm.sale and itm.sale.priceTag ~= 0 then
       local priceTag = Entities.getEntityByID(itm.sale.priceTag)
