@@ -45,12 +45,10 @@ local function packageItems(ev, greater)
         PriceTag.remove(itm)
         table.insert(packageContents, itm)
         chestColor = chestColor or getChestColor(itm)
-        collected = true
       end
     else
       table.insert(packageContents, itm)
       chestColor = chestColor or getChestColor(itm)
-      collected = true
     end
 
     -- Is it single choice?
