@@ -224,6 +224,8 @@ Event.objectDeath.add("deathCollectItems", { order = "descent", filter = "contro
   function(ev)
     -- print(ev.entity.name .. " died.")
     -- print("Is exit requirement met? " .. tostring(Descent.isExitRequirementLogicallyMet()))
-    collectItems()
+    if Descent.isExitRequirementLogicallyMet() then
+      collectItems()
+    end
   end
 )
