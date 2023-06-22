@@ -125,6 +125,83 @@ Event.objectDeath.add("doesntCollectOnDeath",
   end
 )
 
+local function collectItems()
+  -- Iterate all controllable entities with Lola_descentCollectItems.
+  -- Disable any Lola_forcedLowPercent they may have, then collect
+  -- their listed items, before re-enabling.
+  for e in Entities.entitiesWithComponents { "Lola_descentCollectItems", "controllable" } do
+    local singleChoices = {}
+
+    if e.Lola_descentCollectItems.active then
+      local holster = nil
+
+      -- Search for holsters
+      -- caching them saves some computations later
+      for i, v in ipairs(Inventory.getItems(e)) do
+        if v.itemHolster then
+          holster = v
+        end
+      end
+
+      if e.Lola_forcedLowPercent then
+        e.Lola_forcedLowPercent.active = false
+      end
+
+      for i, itm in ipairs(RevealedItems.getRevealedItems(e)) do
+        -- print(itm.name)
+        -- print("Revealed by player #" .. itm.Lola_revealedBy.playerID)
+
+        local sc = itm.item.singleChoice
+        if sc == 0 then
+          if itm.itemSlot then
+            -- print("Holster swap initiated")
+            local slot = itm.itemSlot.name
+            if not Inventory.hasSlotCapacity(e, slot, 1)
+                and holster
+                and holster.itemHolster.slot == slot then
+              Inventory.swapWithHolster(e, holster)
+            end
+          end
+
+          Inventory.add(itm, e)
+          LowPercent.negate(e, itm)
+          -- print("Item added!")
+        else
+          -- print("Single-choice " .. sc .. " found, adding there!")
+          local list = singleChoices[sc] or {}
+          table.insert(list, itm)
+          singleChoices[sc] = list
+        end
+      end
+
+      for k, v in Utilities.sortedPairs(singleChoices) do
+        -- print("Single-choice:")
+        -- print(v)
+        local itm = RNG.choice(v, channel(e))
+
+        if itm.itemSlot then
+          -- print("Holster swap initiated")
+          local slot = itm.itemSlot.name
+          if not Inventory.hasSlotCapacity(e, slot, 1)
+              and holster
+              and holster.itemHolster.slot == slot then
+            Inventory.swapWithHolster(e, holster)
+          end
+        end
+
+        Inventory.add(itm, e)
+        LowPercent.negate(e, itm)
+      end
+
+      if e.Lola_forcedLowPercent then
+        e.Lola_forcedLowPercent.active = true
+      end
+    else
+      e.Lola_descentCollectItems.active = true
+    end
+  end
+end
+
 Event.objectDescentEnd.add("descent",
   { order = "collectItems", filter = "controllable", sequence = 1 },
   function(ev)
@@ -138,80 +215,15 @@ Event.objectDescentEnd.add("descent",
     -- Also, if this is the last one to exit, we should collect items and
     -- check Low%s.
     if ev.exitRequirementMet then
-      -- Iterate all controllable entities with Lola_descentCollectItems.
-      -- Disable any Lola_forcedLowPercent they may have, then collect
-      -- their listed items, before re-enabling.
-      for e in Entities.entitiesWithComponents { "Lola_descentCollectItems", "controllable" } do
-        local singleChoices = {}
-
-        if e.Lola_descentCollectItems.active then
-          local holster = nil
-
-          -- Search for holsters
-          -- caching them saves some computations later
-          for i, v in ipairs(Inventory.getItems(e)) do
-            if v.itemHolster then
-              holster = v
-            end
-          end
-
-          if e.Lola_forcedLowPercent then
-            e.Lola_forcedLowPercent.active = false
-          end
-
-          for i, itm in ipairs(RevealedItems.getRevealedItems(e)) do
-            -- print(itm.name)
-            -- print("Revealed by player #" .. itm.Lola_revealedBy.playerID)
-
-            local sc = itm.item.singleChoice
-            if sc == 0 then
-              if itm.itemSlot then
-                -- print("Holster swap initiated")
-                local slot = itm.itemSlot.name
-                if not Inventory.hasSlotCapacity(e, slot, 1)
-                    and holster
-                    and holster.itemHolster.slot == slot then
-                  Inventory.swapWithHolster(e, holster)
-                end
-              end
-
-              Inventory.add(itm, e)
-              LowPercent.negate(e, itm)
-              -- print("Item added!")
-            else
-              -- print("Single-choice " .. sc .. " found, adding there!")
-              local list = singleChoices[sc] or {}
-              table.insert(list, itm)
-              singleChoices[sc] = list
-            end
-          end
-
-          for k, v in Utilities.sortedPairs(singleChoices) do
-            -- print("Single-choice:")
-            -- print(v)
-            local itm = RNG.choice(v, channel(e))
-
-            if itm.itemSlot then
-              -- print("Holster swap initiated")
-              local slot = itm.itemSlot.name
-              if not Inventory.hasSlotCapacity(e, slot, 1)
-                  and holster
-                  and holster.itemHolster.slot == slot then
-                Inventory.swapWithHolster(e, holster)
-              end
-            end
-
-            Inventory.add(itm, e)
-            LowPercent.negate(e, itm)
-          end
-
-          if e.Lola_forcedLowPercent then
-            e.Lola_forcedLowPercent.active = true
-          end
-        else
-          e.Lola_descentCollectItems.active = true
-        end
-      end
+      collectItems()
     end
+  end
+)
+
+Event.objectDeath.add("deathCollectItems", { order = "descent", filter = "controllable", sequence = 1 },
+  function(ev)
+    -- print(ev.entity.name .. " died.")
+    -- print("Is exit requirement met? " .. tostring(Descent.isExitRequirementLogicallyMet()))
+    collectItems()
   end
 )
