@@ -1,6 +1,6 @@
 local Event = require "necro.event.Event"
 
-local RevealedItems = require "NixsChars.mod.RevealedItems"
+local RevealedItems = require "Lola.mod.RevealedItems"
 
 local transactionBy = nil
 
@@ -18,7 +18,7 @@ Event.shopkeeperTransaction.add("clearTransaction",
   end
 )
 
-Event.objectSpawn.add("transactionItems", { order = "overrides", filter = "NixsChars_revealedBy" },
+Event.objectSpawn.add("transactionItems", { order = "overrides", filter = "Lola_revealedBy" },
   function(ev)
     if transactionBy then
       RevealedItems.mark(transactionBy, ev.entity)

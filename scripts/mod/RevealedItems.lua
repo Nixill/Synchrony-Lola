@@ -20,7 +20,7 @@ function module.mark(revealer, item)
   if type(item) == "number" then item = Entities.getEntityByID(item) end
 
   if not (revealer and item
-      and item.NixsChars_revealedBy
+      and item.Lola_revealedBy
       and revealer.controllable
       and revealer.controllable.playerID ~= 0) then
     return nil
@@ -37,11 +37,11 @@ function module.mark(revealer, item)
   end
 
   -- Mark item as revealed by player
-  item.NixsChars_revealedBy.playerID = revealer.controllable.playerID
+  item.Lola_revealedBy.playerID = revealer.controllable.playerID
 
   -- If player tracks revealed items, add item to player's revealed list
-  if revealer.NixsChars_descentCollectItems then
-    table.insert(revealer.NixsChars_descentCollectItems.revealedItems, item.id)
+  if revealer.Lola_descentCollectItems then
+    table.insert(revealer.Lola_descentCollectItems.revealedItems, item.id)
   end
 
   return out
@@ -62,21 +62,21 @@ function module.unmark(item)
   if type(item) == "number" then item = Entities.getEntityByID(item) end
 
   if not (item
-      and item.NixsChars_revealedBy) then
+      and item.Lola_revealedBy) then
     return nil
   end
 
   -- Get the current revealer.
-  local pid = item.NixsChars_revealedBy.playerID
+  local pid = item.Lola_revealedBy.playerID
 
   if pid ~= 0 then
-    item.NixsChars_revealedBy.playerID = 0
+    item.Lola_revealedBy.playerID = 0
 
     local player = Player.getPlayerEntity(pid)
 
-    if player and player.NixsChars_descentCollectItems then
+    if player and player.Lola_descentCollectItems then
       local pos = nil
-      for i, v in ipairs(player.NixsChars_descentCollectItems.revealedItems) do
+      for i, v in ipairs(player.Lola_descentCollectItems.revealedItems) do
         if v == item.id then
           pos = i
           break
@@ -84,7 +84,7 @@ function module.unmark(item)
       end
 
       if pos then
-        table.remove(player.NixsChars_descentCollectItems.revealedItems, pos)
+        table.remove(player.Lola_descentCollectItems.revealedItems, pos)
       end
     end
   end
@@ -100,11 +100,11 @@ function module.getRevealedItems(player)
   if type(player) == "number" then player = Entities.getEntityByID(player) end
 
   if not (player
-      and player.NixsChars_descentCollectItems) then
+      and player.Lola_descentCollectItems) then
     return nil
   end
 
-  return Utilities.map(player.NixsChars_descentCollectItems.revealedItems, Entities.getEntityByID)
+  return Utilities.map(player.Lola_descentCollectItems.revealedItems, Entities.getEntityByID)
 end
 
 function module.getRevealedItemsPID(playerID)

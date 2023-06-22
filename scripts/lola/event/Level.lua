@@ -8,9 +8,9 @@ local ItemPickup   = require "necro.game.item.ItemPickup"
 local LowPercent   = require "necro.game.item.LowPercent"
 local Object       = require "necro.game.object.Object"
 
-local RevealedItems = require "NixsChars.mod.RevealedItems"
+local RevealedItems = require "Lola.mod.RevealedItems"
 
-Event.levelLoad.add("lolaHeldItemsSafe", { order = "initialItems", sequence = 1 },
+Event.levelLoad.add("heldItemsSafe", { order = "initialItems", sequence = 1 },
   function(ev)
     if CurrentLevel.isLobby() then return end
 

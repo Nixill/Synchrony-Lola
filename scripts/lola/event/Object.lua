@@ -11,24 +11,24 @@ local Object       = require "necro.game.object.Object"
 local RNG          = require "necro.game.system.RNG"
 local Utilities    = require "system.utils.Utilities"
 
-local RevealedItems = require "NixsChars.mod.RevealedItems"
+local RevealedItems = require "Lola.mod.RevealedItems"
 
 local function channel(player)
   if GameDLC.isSynchronyLoaded() and player.Sync_possessable then
     player = Entities.getEntityByID(player.Sync_possessable.possessor)
   end
 
-  local ent = player.NixsChars_descentCollectItems.randomizer
+  local ent = player.Lola_descentCollectItems.randomizer
 
   if ent == nil then
-    ent = Entities.spawn("NixsChars_Randomizer")
-    player.NixsChars_descentCollectItems.randomizer = ent
+    ent = Entities.spawn("Lola_Randomizer")
+    player.Lola_descentCollectItems.randomizer = ent
   end
 
   return ent
 end
 
-Event.objectInteract.add("lolaShrineDeath",
+Event.objectInteract.add("shrineDeath",
   { order = "lowPercent", filter = "interactableNegateLowPercent", sequence = -1 },
   function(ev)
     if CurrentLevel.isLobby() or ev.suppressed then return end
@@ -36,11 +36,11 @@ Event.objectInteract.add("lolaShrineDeath",
     local source = ev.interactor
     local target = ev.entity
 
-    if source.NixsChars_forcedLowPercent and source.NixsChars_forcedLowPercent.active then
+    if source.Lola_forcedLowPercent and source.Lola_forcedLowPercent.active then
       Object.die {
         entity = source,
         killer = target,
-        killerName = source.NixsChars_forcedLowPercent.killerName,
+        killerName = source.Lola_forcedLowPercent.killerName,
         damageType = Damage.Type.SELF_DESTRUCT
         --     1 BYPASS_ARMOR
         --     2 BYPASS_INVINCIBILITY
@@ -54,7 +54,7 @@ Event.objectInteract.add("lolaShrineDeath",
   end
 )
 
-Event.objectInteract.add("lolaChestRevealer",
+Event.objectInteract.add("chestRevealer",
   { order = "selfDestruct", filter = { "storage", "interactableSelfDestruct" }, sequence = -1 },
   function(ev)
     local source = ev.interactor
@@ -64,13 +64,13 @@ Event.objectInteract.add("lolaChestRevealer",
 
     if CurrentLevel.isLobby() or ev.suppressed or not source.controllable or source.controllable.playerID == 0 then return end
 
-    target.NixsChars_interactedBy.playerID = source.controllable.playerID
+    target.Lola_interactedBy.playerID = source.controllable.playerID
 
-    -- print(target.name .. " interacted by player " .. target.NixsChars_interactedBy.playerID)
+    -- print(target.name .. " interacted by player " .. target.Lola_interactedBy.playerID)
   end
 )
 
-Event.objectTakeDamage.add("lolaCrateAttacker",
+Event.objectTakeDamage.add("crateAttacker",
   { order = "armorMinimumDamage", filter = "storage", sequence = -1 },
   function(ev)
     local source = ev.attacker
@@ -80,21 +80,21 @@ Event.objectTakeDamage.add("lolaCrateAttacker",
 
     if CurrentLevel.isLobby() or ev.suppressed or not source.controllable or source.controllable.playerID == 0 then return end
 
-    target.NixsChars_interactedBy.playerID = source.controllable.playerID
+    target.Lola_interactedBy.playerID = source.controllable.playerID
 
-    -- print(target.name .. " interacted by player " .. target.NixsChars_interactedBy.playerID)
+    -- print(target.name .. " interacted by player " .. target.Lola_interactedBy.playerID)
   end
 )
 
-Event.objectTryCollectItem.add("lolaItemDeath",
-  { order = "lowPercent", sequence = -1, filter = "NixsChars_forcedLowPercent" },
+Event.objectTryCollectItem.add("itemDeath",
+  { order = "lowPercent", sequence = -1, filter = "Lola_forcedLowPercent" },
   function(ev)
     local source = ev.entity
     local target = ev.item
 
     if CurrentLevel.isLobby()
         or ev.result ~= ItemPickup.Result.SUCCESS
-        or not (source.NixsChars_forcedLowPercent.active
+        or not (source.Lola_forcedLowPercent.active
             and target.itemNegateLowPercent
             and target.itemNegateLowPercent.active)
         or not source.lowPercent
@@ -107,7 +107,7 @@ Event.objectTryCollectItem.add("lolaItemDeath",
     Object.die {
       entity = source,
       killer = target,
-      killerName = source.NixsChars_forcedLowPercent.killerName,
+      killerName = source.Lola_forcedLowPercent.killerName,
       damageType = Damage.Type.SELF_DESTRUCT
       --     1 BYPASS_ARMOR
       --     2 BYPASS_INVINCIBILITY
@@ -118,34 +118,33 @@ Event.objectTryCollectItem.add("lolaItemDeath",
   end
 )
 
-Event.objectDeath.add("lolaDoesntCollectOnDeath",
-  { order = "dead", filter = "NixsChars_descentCollectItems", sequence = 1 },
+Event.objectDeath.add("doesntCollectOnDeath",
+  { order = "dead", filter = "Lola_descentCollectItems", sequence = 1 },
   function(ev)
-    ev.entity.NixsChars_descentCollectItems.active = false
+    ev.entity.Lola_descentCollectItems.active = false
   end
 )
 
-Event.objectDescentEnd.add("lolaDescent",
+Event.objectDescentEnd.add("descent",
   { order = "collectItems", filter = "controllable", sequence = 1 },
   function(ev)
     if CurrentLevel.isLobby() then return end
 
     -- If not stairs, no collecting items.
-    if ev.type ~= Descent.Type.STAIRS and ev.entity.NixsChars_descentCollectItems then
-      ev.entity.NixsChars_descentCollectItems.active = false
+    if ev.type ~= Descent.Type.STAIRS and ev.entity.Lola_descentCollectItems then
+      ev.entity.Lola_descentCollectItems.active = false
     end
 
     -- Also, if this is the last one to exit, we should collect items and
     -- check Low%s.
     if ev.exitRequirementMet then
-      -- Iterate all controllable entities with
-      -- NixsChars_descentCollectItems. Disable any
-      -- NixsChars_forcedLowPercent they may have, then collect their
-      -- listed items, before re-enabling.
-      for e in Entities.entitiesWithComponents { "NixsChars_descentCollectItems", "controllable" } do
+      -- Iterate all controllable entities with Lola_descentCollectItems.
+      -- Disable any Lola_forcedLowPercent they may have, then collect
+      -- their listed items, before re-enabling.
+      for e in Entities.entitiesWithComponents { "Lola_descentCollectItems", "controllable" } do
         local singleChoices = {}
 
-        if e.NixsChars_descentCollectItems.active then
+        if e.Lola_descentCollectItems.active then
           local holster = nil
 
           -- Search for holsters
@@ -156,13 +155,13 @@ Event.objectDescentEnd.add("lolaDescent",
             end
           end
 
-          if e.NixsChars_forcedLowPercent then
-            e.NixsChars_forcedLowPercent.active = false
+          if e.Lola_forcedLowPercent then
+            e.Lola_forcedLowPercent.active = false
           end
 
           for i, itm in ipairs(RevealedItems.getRevealedItems(e)) do
             -- print(itm.name)
-            -- print("Revealed by player #" .. itm.NixsChars_revealedBy.playerID)
+            -- print("Revealed by player #" .. itm.Lola_revealedBy.playerID)
 
             local sc = itm.item.singleChoice
             if sc == 0 then
@@ -206,11 +205,11 @@ Event.objectDescentEnd.add("lolaDescent",
             LowPercent.negate(e, itm)
           end
 
-          if e.NixsChars_forcedLowPercent then
-            e.NixsChars_forcedLowPercent.active = true
+          if e.Lola_forcedLowPercent then
+            e.Lola_forcedLowPercent.active = true
           end
         else
-          e.NixsChars_descentCollectItems.active = true
+          e.Lola_descentCollectItems.active = true
         end
       end
     end

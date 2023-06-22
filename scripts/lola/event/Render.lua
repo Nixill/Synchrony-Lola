@@ -26,7 +26,7 @@ Event.render.add("outlineClaimedItems", { order = "outlines", sequence = 1 },
     local blue = false
 
     for i, p in ipairs(focus) do
-      if p.NixsChars_forcedLowPercent and p.NixsChars_forcedLowPercent.active then
+      if p.Lola_forcedLowPercent and p.Lola_forcedLowPercent.active then
         blue = true
 
         if p.lowPercent then
@@ -36,7 +36,7 @@ Event.render.add("outlineClaimedItems", { order = "outlines", sequence = 1 },
         end
       end
 
-      if p.NixsChars_descentCollectItems then
+      if p.Lola_descentCollectItems then
         pids[p.controllable.playerID] = true
       end
     end
@@ -52,17 +52,17 @@ Event.render.add("outlineClaimedItems", { order = "outlines", sequence = 1 },
 
       if blue and itms[item.name] then
         color = BLUE -- blue
-      elseif item.NixsChars_revealedBy then
+      elseif item.Lola_revealedBy then
         if not (item.itemNegateLowPercent and item.itemNegateLowPercent.active) then
           color = BLUE -- blue
-        elseif pids[item.NixsChars_revealedBy.playerID] then
+        elseif pids[item.Lola_revealedBy.playerID] then
           if item.item.singleChoice == 0 then
             color = GREEN -- green
           else
             color = YELLOW -- yellow
           end
-        elseif item.NixsChars_revealedBy.playerID ~= 0
-            and Player.getPlayerEntity(item.NixsChars_revealedBy.playerID).NixsChars_descentCollectItems then
+        elseif item.Lola_revealedBy.playerID ~= 0
+            and Player.getPlayerEntity(item.Lola_revealedBy.playerID).Lola_descentCollectItems then
           color = SILVER -- silver
         end
       elseif not item.itemCurrency then

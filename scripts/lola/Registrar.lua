@@ -8,7 +8,7 @@ Components.register {
   --
   -- The carrier of this component receives any items they reveal when
   -- they use the stairs to leave the floor.
-  NixsChars_descentCollectItems = {
+  Lola_descentCollectItems = {
     Components.field.bool("active", true),
     Components.field.entityID("randomizer"),
     Components.field.table("revealedItems", {})
@@ -24,7 +24,7 @@ Components.register {
   --
   -- A setting in the options allows this component to cause an invalid
   -- move instead of a death.
-  NixsChars_forcedLowPercent = {
+  Lola_forcedLowPercent = {
     Components.field.bool("active", true),
     Components.constant.localizedString("killerName", "Lola's Curse")
   },
@@ -34,7 +34,7 @@ Components.register {
   -- If the entity is attacked or interacted with by a player, that
   -- player's ID is stored here. If the storage is subsequently opened,
   -- any items it contained get marked as revealed by that player.
-  NixsChars_interactedBy = {
+  Lola_interactedBy = {
     Components.field.int("playerID", 0)
   },
 
@@ -45,29 +45,29 @@ Components.register {
   -- did so.
   --
   -- "player" is reset to 0 if any player picks it up.
-  NixsChars_revealedBy = {
+  Lola_revealedBy = {
     Components.field.int("playerID", 0)
   },
 
-  -- This component is only given to NixsChars_SpellcastPackage.
+  -- This component is only given to Lola_SpellcastPackage.
   --
   -- Causes the effect of a spellcast to be the packaging of items into
   -- crates.
-  NixsChars_spellcastPackageItems = {},
+  Lola_spellcastPackageItems = {},
 
-  -- This component is only given to NixsChars_SpellcastPackageGreater.
+  -- This component is only given to Lola_SpellcastPackageGreater.
   --
   -- Causes the effect of a spellcast to be the packaging of items into
   -- chests.
-  NixsChars_spellcastPackageItemsGreater = {}
+  Lola_spellcastPackageItemsGreater = {}
 }
 
 CustomEntities.extend {
   template = CustomEntities.template.player(0),
-  name = "NixsChars_Lola",
+  name = "Lola_Lola",
   components = {
-    NixsChars_descentCollectItems = {},
-    NixsChars_forcedLowPercent = {},
+    Lola_descentCollectItems = {},
+    Lola_forcedLowPercent = {},
     forceNonSilhouetteVision = {
       component = "storage"
     },
@@ -82,7 +82,7 @@ CustomEntities.extend {
         "ShovelBasic",
         "WeaponDagger",
         "Bomb",
-        "NixsChars_SpellPackage"
+        "Lola_SpellPackage"
       }
     },
     inventoryBannedItems = {
@@ -135,13 +135,13 @@ CustomEntities.extend {
 }
 
 CustomEntities.register {
-  name = "NixsChars_Randomizer",
+  name = "Lola_Randomizer",
   random = {}
 }
 
 CustomEntities.register {
-  name = "NixsChars_SpellcastPackage",
-  NixsChars_spellcastPackageItems = {},
+  name = "Lola_SpellcastPackage",
+  Lola_spellcastPackageItems = {},
   friendlyName = {
     name = "Package"
   },
@@ -158,15 +158,15 @@ CustomEntities.register {
   },
   spellcastUpgradable = {
     upgradeTypes = {
-      greater = "NixsChars_SpellcastPackageGreater"
+      greater = "Lola_SpellcastPackageGreater"
     }
   },
   spellcastUseFacingDirection = {},
 }
 
 CustomEntities.register {
-  name = "NixsChars_SpellcastPackageGreater",
-  NixsChars_spellcastPackageItemsGreater = {},
+  name = "Lola_SpellcastPackageGreater",
+  Lola_spellcastPackageItemsGreater = {},
   friendlyName = {
     name = "Greater Package"
   },
@@ -186,7 +186,7 @@ CustomEntities.register {
 
 CustomEntities.extend {
   template = CustomEntities.template.item(),
-  name = "NixsChars_SpellPackage",
+  name = "Lola_SpellPackage",
   components = {
     Sync_itemExcludeFromCloneDrop = {},
     friendlyName = {
@@ -194,7 +194,7 @@ CustomEntities.extend {
     },
     itemBanInnateSpell = {},
     itemCastOnUse = {
-      spell = "NixsChars_SpellcastPackage"
+      spell = "Lola_SpellcastPackage"
     },
     itemHintLabel = {
       text = "Package items into crates"

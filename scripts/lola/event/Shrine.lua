@@ -1,7 +1,7 @@
 local Event   = require "necro.event.Event"
 local GameDLC = require "necro.game.data.resource.GameDLC"
 
-local RevealedItems = require "NixsChars.mod.RevealedItems"
+local RevealedItems = require "Lola.mod.RevealedItems"
 
 local shrineBy = nil
 
@@ -31,7 +31,7 @@ if GameDLC.isSynchronyLoaded then
   end)
 end
 
-Event.objectSpawn.add("shrineDetected", { order = "overrides", filter = "NixsChars_revealedBy" }, function(ev)
+Event.objectSpawn.add("shrineDetected", { order = "overrides", filter = "Lola_revealedBy" }, function(ev)
   if shrineBy then
     RevealedItems.mark(shrineBy, ev.entity)
   end

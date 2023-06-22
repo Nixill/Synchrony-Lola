@@ -6,7 +6,7 @@ local Object         = require "necro.game.object.Object"
 local PriceTag       = require "necro.game.item.PriceTag"
 local SpellTargeting = require "necro.game.spell.SpellTargeting"
 
-local RevealedItems = require "NixsChars.mod.RevealedItems"
+local RevealedItems = require "Lola.mod.RevealedItems"
 
 local function getChestColor(itm)
   if itm.itemPoolRedChest then return "Red"
@@ -27,7 +27,7 @@ local function packageItems(ev, greater)
   local y = nil
 
   -- Iterate through any items on the tile to see what we can afford.
-  for itm in SpellTargeting.targetsWithComponent(ev, "NixsChars_revealedBy") do
+  for itm in SpellTargeting.targetsWithComponent(ev, "Lola_revealedBy") do
     -- Make sure it's on the same tile (or a tile hasn't been set)
     if x then
       if itm.position.x ~= x or itm.position.y ~= y then return end
@@ -67,7 +67,7 @@ local function packageItems(ev, greater)
   if #packageContents > 0 then
     package = Object.spawn(pType, x, y)
     ItemStorage.clear(package)
-    for itm in SpellTargeting.targetsWithComponent(ev, "NixsChars_revealedBy") do
+    for itm in SpellTargeting.targetsWithComponent(ev, "Lola_revealedBy") do
       ItemStorage.store(itm, package)
       RevealedItems.unmark(itm)
     end
@@ -75,18 +75,18 @@ local function packageItems(ev, greater)
   end
 end
 
-Event.spellcast.add("lolaCrateItem",
-  { order = "convertItems", filter = "NixsChars_spellcastPackageItems", sequence = 1 },
+Event.spellcast.add("crateItem",
+  { order = "convertItems", filter = "Lola_spellcastPackageItems", sequence = 1 },
   function(ev)
-    print("Lesser Package")
+    -- print("Lesser Package")
     packageItems(ev, false)
   end
 )
 
-Event.spellcast.add("lolaChestItem",
-  { order = "convertItems", filter = "NixsChars_spellcastPackageItemsGreater", sequence = 2 },
+Event.spellcast.add("chestItem",
+  { order = "convertItems", filter = "Lola_spellcastPackageItemsGreater", sequence = 2 },
   function(ev)
-    print("Greater Package")
+    -- print("Greater Package")
     packageItems(ev, true)
   end
 )
