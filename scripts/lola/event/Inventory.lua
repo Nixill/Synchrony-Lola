@@ -10,9 +10,9 @@ Event.inventoryAddItem.add("untrack", { order = "unmap", sequence = 1 },
     end
 
     -- Theoretically, both if statements should pass or fail together,
-    -- i.e. the following expression should evaluate to true, but making
-    -- them separate if statements means other mods are less likely to be
-    -- able to break things.
+    -- i.e. the following expression should always evaluate to true, but
+    -- making them separate if statements means other mods are less likely
+    -- to be able to break things.
     -- (not not ev.item.Lola_revealedBy) == (not not ev.itemLola_holders)
     if ev.item.Lola_holders then
       ItemHolders.add(ev.holder, ev.item)
@@ -23,8 +23,8 @@ Event.inventoryAddItem.add("untrack", { order = "unmap", sequence = 1 },
 Event.itemConsume.add("glassShard", { order = "convert", sequence = 1 },
   function(ev)
     local drop = ev.droppedItem
-    if drop and drop.itemNegateLowPercent then
-      drop.itemNegateLowPercent.active = false
+    if drop then
+      ItemHolders.add(ev.holder, drop)
     end
   end
 )
