@@ -23,8 +23,8 @@ Event.inventoryAddItem.add("untrack", { order = "unmap", sequence = 1 },
 Event.itemConsume.add("glassShard", { order = "convert", sequence = 1 },
   function(ev)
     local drop = ev.droppedItem
-    if drop and drop.itemNegateLowPercent then
-      drop.itemNegateLowPercent.active = false
+    if drop then
+      ItemHolders.add(ev.holder, drop)
     end
   end
 )
