@@ -109,4 +109,28 @@ function module.checkPID(item, playerID)
   return not not item.Lola_holders.playerIDs[playerID]
 end
 
+-- Check whether an item was held by any of the players.
+--
+-- Returns true if that item was held by any player in the list. Returns
+-- false otherwise. nil is returned if the call fails.
+--
+-- item may be passed as an entity table or an entity ID. playerIDs MUST
+-- be passed as a set (not list!) of player IDs ONLY.
+function module.checkAllPIDs(item, playerIDs)
+  if type(item) == "number" then item = Entities.getEntityByID(item) end
+
+  if not (item
+      and item.Lola_holders) then
+    return nil
+  end
+
+  for k in pairs(playerIDs) do
+    if item.Lola_holders.playerIDs[k] then
+      return true
+    end
+  end
+
+  return false
+end
+
 return module

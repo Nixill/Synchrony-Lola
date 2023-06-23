@@ -9,6 +9,8 @@ local PlayerList    = require "necro.client.PlayerList"
 local Render        = require "necro.render.Render"
 local Utilities     = require "system.utils.Utilities"
 
+local ItemHolders = require "Lola.mod.ItemHolders"
+
 local BLUE   = Color.rgb(43, 66, 180)
 local GREEN  = Color.rgb(66, 180, 43)
 local SILVER = Color.rgb(150, 150, 150)
@@ -19,16 +21,23 @@ Event.render.add("outlineClaimedItems", { order = "outlines", sequence = 1 },
     if CurrentLevel.isLobby() then return end
 
     local focus = Focus.getAll()
+    local focusPIDs = {}
 
     -- Get focused players and their lowPercentAllowedItems
     local pids = {}
     local itms = {}
     local blue = false
 
+    -- Iterate all focused players
     for i, p in ipairs(focus) do
+      -- If that player is forced to be low% then...
       if p.Lola_forcedLowPercent and p.Lola_forcedLowPercent.active then
+        -- ... we can use blue rendering later. (This doesn't apply if no
+        -- focused player is forced low%.)
         blue = true
 
+        -- Also iterate their allowed items, so that we know *which* items
+        -- to render blue.
         if p.lowPercent then
           for k in pairs(p.lowPercent.allowedItems) do
             itms[k] = true
@@ -45,28 +54,31 @@ Event.render.add("outlineClaimedItems", { order = "outlines", sequence = 1 },
     for item in Entities.entitiesWithComponents { "item" } do
       local color
 
+      -- Only outline items that are actually on the floor and revealed.
       if not item.gameObject.tangible
           or not item.visibility.fullyVisible then
         goto continue
       end
 
       if blue and itms[item.name] then
-        color = BLUE -- blue
+        color = BLUE
+      elseif ItemHolders.checkAllPIDs(item, focus) then
+        color = BLUE
       elseif item.Lola_revealedBy then
         if not (item.itemNegateLowPercent and item.itemNegateLowPercent.active) then
-          color = BLUE -- blue
+          color = BLUE
         elseif pids[item.Lola_revealedBy.playerID] then
           if item.item.singleChoice == 0 then
-            color = GREEN -- green
+            color = GREEN
           else
-            color = YELLOW -- yellow
+            color = YELLOW
           end
         elseif item.Lola_revealedBy.playerID ~= 0
             and Player.getPlayerEntity(item.Lola_revealedBy.playerID).Lola_descentCollectItems then
-          color = SILVER -- silver
+          color = SILVER
         end
       elseif not item.itemCurrency then
-        color = BLUE -- blue
+        color = BLUE
       end
 
       if color ~= nil then
