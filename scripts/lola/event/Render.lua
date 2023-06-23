@@ -62,7 +62,7 @@ Event.render.add("outlineClaimedItems", { order = "outlines", sequence = 1 },
 
       if blue and itms[item.name] then
         color = BLUE
-      elseif ItemHolders.checkAllPIDs(item, focus) then
+      elseif ItemHolders.checkAllPIDs(item, pids) then
         color = BLUE
       elseif item.Lola_revealedBy then
         if not (item.itemNegateLowPercent and item.itemNegateLowPercent.active) then
