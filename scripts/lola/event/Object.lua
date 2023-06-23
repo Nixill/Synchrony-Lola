@@ -11,6 +11,7 @@ local Object       = require "necro.game.object.Object"
 local RNG          = require "necro.game.system.RNG"
 local Utilities    = require "system.utils.Utilities"
 
+local ItemHolders   = require "Lola.mod.ItemHolders"
 local RevealedItems = require "Lola.mod.RevealedItems"
 
 local function channel(player)
@@ -92,13 +93,22 @@ Event.objectTryCollectItem.add("itemDeath",
     local source = ev.entity
     local target = ev.item
 
+    -- The player should NOT die if:
+    -- 1. We're in the lobby
     if CurrentLevel.isLobby()
+        -- 2. The item pickup isn't successful
         or ev.result ~= ItemPickup.Result.SUCCESS
+        -- 3. The player doesn't have forced low%
         or not (source.Lola_forcedLowPercent.active
+            -- 4. The target item doesn't negate low%
             and target.itemNegateLowPercent
             and target.itemNegateLowPercent.active)
+        -- 5. The player doesn't have a low% component
         or not source.lowPercent
+        -- 6. The player's low% component explicitly allows the item
         or source.lowPercent.allowedItems[target.name]
+        -- 7. The player has held the item
+        or ItemHolders.check(target, source)
     then return end
 
     ev.result = ItemPickup.Result.FAILURE
