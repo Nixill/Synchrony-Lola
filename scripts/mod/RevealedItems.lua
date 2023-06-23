@@ -1,5 +1,4 @@
 local Entities  = require "system.game.Entities"
-local GameDLC   = require "necro.game.data.resource.GameDLC"
 local Player    = require "necro.game.character.Player"
 local Utilities = require "system.utils.Utilities"
 
@@ -28,13 +27,6 @@ function module.mark(revealer, item)
 
   -- Get the current revealer, if any.
   local out = module.unmark(item)
-
-  -- Make sure we have that player's topmost entity
-  if GameDLC.isSynchronyLoaded() then
-    while revealer.Sync_possessable and revealer.Sync_possessable.possessor ~= 0 do
-      revealer = Entities.getEntityByID(revealer.Sync_possessable.possessor)
-    end
-  end
 
   -- Mark item as revealed by player
   item.Lola_revealedBy.playerID = revealer.controllable.playerID

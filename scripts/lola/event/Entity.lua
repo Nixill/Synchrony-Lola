@@ -5,6 +5,7 @@ Event.entitySchemaLoadEntity.add("addComponents", { order = "overrides" }, funct
 
   if entity.itemNegateLowPercent then
     entity.Lola_revealedBy = {}
+    entity.Lola_holders = {}
   end
 
   if entity.storage then

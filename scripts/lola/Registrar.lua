@@ -22,11 +22,22 @@ Components.register {
   --
   -- If "active" is false, that death is skipped.
   --
-  -- A setting in the options allows this component to cause an invalid
-  -- move instead of a death.
+  -- A setting in the options will allow this component to cause an
+  -- invalid move instead of a death.
   Lola_forcedLowPercent = {
     Components.field.bool("active", true),
     Components.constant.localizedString("killerName", "Lola's Curse")
+  },
+
+  -- This component is given to any item that can negate low%.
+  --
+  -- This tracks whoever has held the item on the current floor. Such
+  -- player may pick that item back up even if they have forced low%.
+  --
+  -- The component is reset to the current holder only at the start of
+  -- each floor.
+  Lola_holders = {
+    Components.field.table("playerIDs", {})
   },
 
   -- This component is given to any entity with storage.
@@ -38,7 +49,7 @@ Components.register {
     Components.field.int("playerID", 0)
   },
 
-  -- This component is given to any item.
+  -- This component is given to any item that can negate low%.
   --
   -- If the item is revealed from a crate, chest, or shrine, or the result
   -- of a conjurer or transmog transaction, "player" to the player that
