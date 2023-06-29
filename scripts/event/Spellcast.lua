@@ -30,7 +30,7 @@ local function packageItems(ev, greater)
   for itm in SpellTargeting.targetsWithComponent(ev, "Lola_revealedBy") do
     -- Make sure it's on the same tile (or a tile hasn't been set)
     if x then
-      if itm.position.x ~= x or itm.position.y ~= y then return end
+      if itm.position.x ~= x or itm.position.y ~= y then goto continue end
     else
       x = itm.position.x
       y = itm.position.y
@@ -60,6 +60,8 @@ local function packageItems(ev, greater)
         end
       end
     end
+
+    ::continue::
   end
 
   local pType = (greater and "Chest" .. (chestColor or "Red")) or "Crate"
@@ -67,11 +69,15 @@ local function packageItems(ev, greater)
   if #packageContents > 0 then
     package = Object.spawn(pType, x, y)
     ItemStorage.clear(package)
-    for itm in SpellTargeting.targetsWithComponent(ev, "Lola_revealedBy") do
+    for i, itm in ipairs(packageContents) do
       ItemStorage.store(itm, package)
       RevealedItems.unmark(itm)
     end
     -- print(itm.name .. "#" .. itm.id)
+  else
+    local tile = ev.tiles[1]
+    package = Object.spawn("Crate", tile[1], tile[2])
+    ItemStorage.clear(package)
   end
 end
 

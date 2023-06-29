@@ -1,4 +1,5 @@
 local Entities  = require "system.game.Entities"
+local GameDLC   = require "necro.game.data.resource.GameDLC"
 local Player    = require "necro.game.character.Player"
 local Utilities = require "system.utils.Utilities"
 
@@ -32,6 +33,15 @@ function module.mark(revealer, item)
   item.Lola_revealedBy.playerID = revealer.controllable.playerID
 
   -- If player tracks revealed items, add item to player's revealed list
+  -- (dear past nix and possibly future nix too: this is why we needed the
+  -- topmost entity in a possession chain)
+  if GameDLC.isSynchronyLoaded() then
+    while revealer.Sync_possessable
+        and revealer.Sync_possessable.possessor ~= 0 do
+      revealer = Entities.getEntityByID(revealer.Sync_possessable.possessor)
+    end
+  end
+
   if revealer.Lola_descentCollectItems then
     table.insert(revealer.Lola_descentCollectItems.revealedItems, item.id)
   end
