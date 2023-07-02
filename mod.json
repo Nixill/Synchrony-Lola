@@ -1,13 +1,11 @@
 {
 	"namespace": "Lola",
 	"displayName": "Lola",
-	"version": "1.0.3",
+	"version": "1.1.0",
 	"synchronyVersion": "3.7.1",
 	"description": "Character who must pick up items indirectly",
 	"author": "Nixill",
-	"dependencies": {
-		"PowerSettings_io_2237104": true
-	},
+	"dependencies": {"PowerSettings_io_2237104":true},
 	"api": {"scriptPath":"scripts"},
 	"icon": "LolaIcon.png",
 	"banner": "LolaBanner.png",
@@ -17,6 +15,6 @@
 	"homepageURL": "https://mod.io/g/crypt/m/lola",
 	"modioID": "3105669",
 	"modioUserID": 12939888,
-	"pendingVersion": "1.0.3",
-	"visibility": 2
+	"pendingVersion": "1.1.0",
+	"visibility": 0
 }
