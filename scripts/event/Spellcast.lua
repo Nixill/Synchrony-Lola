@@ -126,7 +126,9 @@ local function packageItems(ev, greater)
 
   -- Also, let's knockback any knockbackable entities on that tile.
   for target in SpellTargeting.targetsWithComponent(ev, "knockbackable") do
-    Damage.knockback(target, dir, 1, Move.Type.KNOCKBACK, target.knockbackable.beatDelay)
+    if target.position.x == x and target.position.y == y then
+      Damage.knockback(target, dir, 1, Move.Type.KNOCKBACK, target.knockbackable.beatDelay)
+    end
   end
 
   if #packageContents > 0 then
