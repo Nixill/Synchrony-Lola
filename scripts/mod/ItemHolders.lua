@@ -4,6 +4,11 @@ local Utilities = require "system.utils.Utilities"
 
 local module = {}
 
+local function entity(arg)
+  if type(arg) == "number" then return Entities.getEntityByID(arg)
+  else return arg end
+end
+
 -- Add a player to an item's holder list. If the item is already marked as
 -- held by that player, nothing changes.
 --
@@ -13,8 +18,8 @@ local module = {}
 -- holder and item may be passed as entity tables or IDs. To pass a player
 -- ID as the holder, use the addPID function instead.
 function module.add(holder, item)
-  if type(item) == "number" then item = Entities.getEntityByID(item) end
-  if type(holder) == "number" then holder = Entities.getEntityByID(holder) end
+  item = entity(item)
+  holder = entity(holder)
 
   if not (item and holder
       and item.Lola_holders
@@ -47,7 +52,7 @@ end
 --
 -- item may be passed as an entity table or ID.
 function module.reset(item)
-  if type(item) == "number" then item = Entities.getEntityByID(item) end
+  item = entity(item)
 
   if not (item
       and item.Lola_holders) then
@@ -86,7 +91,7 @@ end
 -- item and player may be passed as entity tables or entity IDs. To use a
 -- player ID, use checkPID.
 function module.check(item, player)
-  if type(player) == "number" then player = Entities.getEntityByID(player) end
+  player = entity(player)
 
   if not (player
       and player.controllable
@@ -99,7 +104,7 @@ end
 
 -- Same as ItemHolders.check(), but the second argument should be a player ID.
 function module.checkPID(item, playerID)
-  if type(item) == "number" then item = Entities.getEntityByID(item) end
+  item = entity(item)
 
   if not (item
       and item.Lola_holders) then
@@ -117,7 +122,7 @@ end
 -- item may be passed as an entity table or an entity ID. playerIDs MUST
 -- be passed as a set (not list!) of player IDs ONLY.
 function module.checkAllPIDs(item, playerIDs)
-  if type(item) == "number" then item = Entities.getEntityByID(item) end
+  item = entity(item)
 
   if not (item
       and item.Lola_holders) then
@@ -131,6 +136,27 @@ function module.checkAllPIDs(item, playerIDs)
   end
 
   return false
+end
+
+-- Copy the list of holders from one item to another.
+--
+-- Returns true if the list was successfully copied. nil is returned if
+-- the call fails. false is never returned.
+--
+-- fromItem and toItem may be passed as entity tables or entity IDs.
+function module.copy(fromItem, toItem)
+  fromItem = entity(fromItem)
+  toItem = entity(toItem)
+
+  if not (fromItem and toItem
+      and fromItem.Lola_holders
+      and toItem.Lola_holders) then
+    return nil
+  end
+
+  toItem.Lola_holders.playerIDs = Utilities.fastCopy(fromItem.Lola_holders.playerIDs)
+
+  return true
 end
 
 return module

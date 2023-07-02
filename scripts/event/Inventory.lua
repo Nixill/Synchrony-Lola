@@ -3,6 +3,8 @@ local Event = require "necro.event.Event"
 local ItemHolders   = require "Lola.mod.ItemHolders"
 local RevealedItems = require "Lola.mod.RevealedItems"
 
+local LoSettings = require "Lola.Settings"
+
 Event.inventoryAddItem.add("untrack", { order = "unmap", sequence = 1 },
   function(ev)
     if ev.item.Lola_revealedBy then
@@ -23,8 +25,8 @@ Event.inventoryAddItem.add("untrack", { order = "unmap", sequence = 1 },
 Event.itemConsume.add("glassShard", { order = "convert", sequence = 1 },
   function(ev)
     local drop = ev.droppedItem
-    if drop then
-      ItemHolders.add(ev.holder, drop)
+    if drop and LoSettings.get("gameplay.glass") then
+      ItemHolders.copy(ev.item, ev.droppedItem)
     end
   end
 )

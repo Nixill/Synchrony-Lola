@@ -5,7 +5,9 @@
 	"synchronyVersion": "3.7.1",
 	"description": "Character who must pick up items indirectly",
 	"author": "Nixill",
-	"dependencies": {},
+	"dependencies": {
+		"PowerSettings_io_2237104": true
+	},
 	"api": {"scriptPath":"scripts"},
 	"icon": "LolaIcon.png",
 	"banner": "LolaBanner.png",

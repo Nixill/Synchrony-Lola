@@ -38,10 +38,19 @@ Event.render.add("outlineClaimedItems", { order = "outlines", sequence = 1 },
 
         -- Also iterate their allowed items, so that we know *which* items
         -- to render blue.
+        -- First, the "low% allowed items" (items which don't negate low%
+        -- on being picked up)
         if p.lowPercent then
           for k in pairs(p.lowPercent.allowedItems) do
             itms[k] = true
           end
+        end
+
+        -- And second, the "forcedlow% allowed items" (items which do
+        -- negate low% on being picked up, but for balance reasons, are
+        -- still allowed).
+        for k in pairs(p.Lola_forcedLowPercent.allowedItems) do
+          itms[k] = true
         end
       end
 

@@ -1,7 +1,9 @@
+local Action         = require "necro.game.system.Action"
 local Components     = require "necro.game.data.Components"
 local CustomEntities = require "necro.game.data.CustomEntities"
-local HSVFilter      = require "necro.render.filter.HSVFilter"
 local ItemBan        = require "necro.game.item.ItemBan"
+
+local Direction = Action.Direction
 
 Components.register {
   -- Component given to Lola (by default)
@@ -26,7 +28,8 @@ Components.register {
   -- invalid move instead of a death.
   Lola_forcedLowPercent = {
     Components.field.bool("active", true),
-    Components.constant.localizedString("killerName", "Lola's Curse")
+    Components.constant.localizedString("killerName", "Lola's Curse"),
+    Components.constant.table("allowedItems", {})
   },
 
   -- This component is given to any item that can negate low%.
@@ -70,15 +73,48 @@ Components.register {
   --
   -- Causes the effect of a spellcast to be the packaging of items into
   -- chests.
-  Lola_spellcastPackageItemsGreater = {}
+  Lola_spellcastPackageItemsGreater = {},
+
+  -- This component is given to both Lola_SpellcastPackageGreater and
+  -- Lola_SpellcastPackage.
+  --
+  -- Causes the spellcast to create a flyaway which varies based on the
+  -- targets of the spell.
+  Lola_spellcastFlyawayPackage = {
+    Components.constant.localizedString("baseText", ""),
+    Components.constant.localizedString("noTargets", ""),
+    Components.constant.localizedString("cantAfford", ""),
+    Components.constant.localizedString("enemyCrate", ""),
+    Components.constant.int("offsetY", 0)
+  }
 }
 
 CustomEntities.extend {
-  template = CustomEntities.template.player(0),
+  template = CustomEntities.template.player(),
   name = "Lola_Lola",
-  components = {
+  components = { {
     Lola_descentCollectItems = {},
-    Lola_forcedLowPercent = {},
+    Lola_forcedLowPercent = {
+      allowedItems = {
+        MiscPotion = true
+      }
+    },
+    NixLib_partialDirectionalSpriteChange = {
+      frameX = {
+        [Direction.UP_LEFT] = 16,
+        [Direction.LEFT] = 16,
+        [Direction.DOWN_LEFT] = 16
+      },
+      ignored = {
+        [Direction.UP] = true,
+        [Direction.DOWN] = true
+      }
+    },
+    bestiary = {
+      focusX = 297,
+      focusY = 169,
+      image = "mods/Lola/gfx/lola_bestiary.png"
+    },
     forceNonSilhouetteVision = {
       component = "storage"
     },
@@ -90,16 +126,17 @@ CustomEntities.extend {
     },
     initialInventory = {
       items = {
-        "ShovelBasic",
-        "WeaponDagger",
-        "Bomb",
-        "Lola_SpellPackage"
+        "ShovelBasic"
+        -- NOTE: An entitySchemaLoadEntity handler will add (or not add)
+        -- Dagger (or Lute), Bombs, and the Package Spell according to
+        -- user settings.
       }
     },
     inventoryBannedItems = {
       components = {
-        itemBanInnateSpell = ItemBan.Type.LOCK,
         itemGrantContentsVision = ItemBan.Type.FULL
+        -- NOTE: An entitySchemaLoadEntity handler will add (or not add)
+        -- itemBanInnateSpell = ItemBan.Type.LOCK according to user settings.
       }
     },
     minimapVision = {
@@ -108,41 +145,21 @@ CustomEntities.extend {
     playableCharacter = {
       lobbyOrder = -2370
     },
-    playerXMLMapping = false,
     sprite = {
-      texture = HSVFilter.getPath("ext/entities/char2_armor_body.png",
-        30 / 360, 0, 0)
+      texture = "mods/Lola/gfx/lola_armor_body.png"
     },
-    subtitled = false,
     textCharacterSelectionMessage = {
       text = "Lola mode!\n"
           .. "Low% rules apply.\n"
           .. "Receive revealed items (from\n"
           .. "chests, crates, etc.) when\n"
           .. "done with the floor!"
-    },
-    traitStoryBosses = false,
-    voiceConfused = false,
-    voiceDeath = false,
-    voiceDescend = false,
-    voiceDig = false,
-    voiceGrabbed = false,
-    voiceGreeting = false,
-    voiceHeal = false,
-    voiceHit = false,
-    voiceHotTileStep = false,
-    voiceMeleeAttack = false,
-    voiceNotice = false,
-    voiceRangedAttack = false,
-    voiceShrink = false,
-    voiceSlideStart = false,
-    voiceSpellCasterPrefix = false,
-    voiceSquish = false,
-    voiceStairsUnlock = false,
-    voiceTeleport = false,
-    voiceUnshrink = false,
-    voiceWind = false
-  }
+    }
+  }, {
+    sprite = {
+      texture = "mods/Lola/gfx/lola_heads.png"
+    }
+  } }
 }
 
 CustomEntities.register {
@@ -152,6 +169,11 @@ CustomEntities.register {
 
 CustomEntities.register {
   name = "Lola_SpellcastPackage",
+  Lola_spellcastFlyawayPackage = {
+    baseText = "Package",
+    noTargets = "Package (empty)",
+    cantAfford = "Package (can't afford)"
+  },
   Lola_spellcastPackageItems = {},
   friendlyName = {
     name = "Package"
@@ -160,10 +182,6 @@ CustomEntities.register {
     sound = "spellGeneral"
   },
   spellcast = {},
-  spellcastFlyaway = {
-    offsetY = 0,
-    text = "Package"
-  },
   spellcastTargetTiles = {
     offsets = { { 1, 0 }, { 0, -1 }, { 0, 1 }, { -1, 0 } }
   },
@@ -177,6 +195,12 @@ CustomEntities.register {
 
 CustomEntities.register {
   name = "Lola_SpellcastPackageGreater",
+  Lola_spellcastFlyawayPackage = {
+    baseText = "Greater Package",
+    noTargets = "Greater Package (empty)",
+    cantAfford = "Greater Package (can't afford)",
+    enemyCrate = "Greater Package (enemy captured)"
+  },
   Lola_spellcastPackageItemsGreater = {},
   friendlyName = {
     name = "Greater Package"
@@ -185,10 +209,6 @@ CustomEntities.register {
     sound = "spellGeneral"
   },
   spellcast = {},
-  spellcastFlyaway = {
-    offsetY = 0,
-    text = "Greater Package"
-  },
   spellcastTargetTiles = {
     offsets = { { 1, 0 }, { 0, -1 }, { 0, 1 }, { -1, 0 } }
   },

@@ -29,6 +29,7 @@ local function channel(player)
   return ent
 end
 
+--#region objectInteract{interactableNegateLowPercent} → shrineDeath
 Event.objectInteract.add("shrineDeath",
   { order = "lowPercent", filter = "interactableNegateLowPercent", sequence = -1 },
   function(ev)
@@ -54,7 +55,9 @@ Event.objectInteract.add("shrineDeath",
     end
   end
 )
+--#endregion
 
+--#region objectInteract{storage,interactableSelfDestruct} → chestRevealer
 Event.objectInteract.add("chestRevealer",
   { order = "selfDestruct", filter = { "storage", "interactableSelfDestruct" }, sequence = -1 },
   function(ev)
@@ -70,7 +73,9 @@ Event.objectInteract.add("chestRevealer",
     -- print(target.name .. " interacted by player " .. target.Lola_interactedBy.playerID)
   end
 )
+--#endregion
 
+--#region objectTakeDamge{storage} → crateAttacker
 Event.objectTakeDamage.add("crateAttacker",
   { order = "armorMinimumDamage", filter = "storage", sequence = -1 },
   function(ev)
@@ -86,7 +91,9 @@ Event.objectTakeDamage.add("crateAttacker",
     -- print(target.name .. " interacted by player " .. target.Lola_interactedBy.playerID)
   end
 )
+--#endregion
 
+--#region objectTryCollectItem{Lola_forcedLowPercent} → itemDeath
 Event.objectTryCollectItem.add("itemDeath",
   { order = "lowPercent", sequence = -1, filter = "Lola_forcedLowPercent" },
   function(ev)
@@ -98,16 +105,18 @@ Event.objectTryCollectItem.add("itemDeath",
     if CurrentLevel.isLobby()
         -- 2. The item pickup isn't successful
         or ev.result ~= ItemPickup.Result.SUCCESS
-        -- 3. The player doesn't have forced low%
-        or not (source.Lola_forcedLowPercent.active
-            -- 4. The target item doesn't negate low%
-            and target.itemNegateLowPercent
+        -- 3. The player doesn't have forced low% active
+        or not source.Lola_forcedLowPercent.active
+        -- 4. The target item doesn't negate low%
+        or not (target.itemNegateLowPercent
             and target.itemNegateLowPercent.active)
         -- 5. The player doesn't have a low% component
         or not source.lowPercent
         -- 6. The player's low% component explicitly allows the item
         or source.lowPercent.allowedItems[target.name]
-        -- 7. The player has held the item
+        -- 7. The player's forced low% component explicitly allows the item
+        or source.Lola_forcedLowPercent.allowedItems[target.name]
+        -- 8. The player has held the item
         or ItemHolders.check(target, source)
     then return end
 
@@ -127,13 +136,16 @@ Event.objectTryCollectItem.add("itemDeath",
     }
   end
 )
+--#endregion
 
-Event.objectDeath.add("doesntCollectOnDeath",
+--#region objectDeath{Lola_descentCollectItems} → dontCollectOnDeath
+Event.objectDeath.add("dontCollectOnDeath",
   { order = "dead", filter = "Lola_descentCollectItems", sequence = 1 },
   function(ev)
     ev.entity.Lola_descentCollectItems.active = false
   end
 )
+--#endregion
 
 local function collectItems()
   -- Iterate all controllable entities with Lola_descentCollectItems.
@@ -212,6 +224,7 @@ local function collectItems()
   end
 end
 
+--#region objectDescentEnd{controllable} → descent
 Event.objectDescentEnd.add("descent",
   { order = "collectItems", filter = "controllable", sequence = 1 },
   function(ev)
@@ -229,7 +242,9 @@ Event.objectDescentEnd.add("descent",
     end
   end
 )
+--#endregion
 
+--#region objectDeath{controllable} → deathCollectItems
 Event.objectDeath.add("deathCollectItems", { order = "descent", filter = "controllable", sequence = 1 },
   function(ev)
     -- print(ev.entity.name .. " died.")
@@ -239,3 +254,4 @@ Event.objectDeath.add("deathCollectItems", { order = "descent", filter = "contro
     end
   end
 )
+--#endregion
