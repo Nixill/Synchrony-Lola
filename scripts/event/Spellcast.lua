@@ -53,7 +53,7 @@ local function packageItems(ev, greater)
     if itm.sale and itm.sale.priceTag ~= 0 then
       local priceTag = Entities.getEntityByID(itm.sale.priceTag)
 
-      if priceTag then
+      if priceTag and priceTag.priceTag and priceTag.priceTag.active then
         if PriceTag.check(ev.caster, priceTag).affordable then
           PriceTag.pay(ev.caster, priceTag)
           PriceTag.remove(itm)
@@ -62,6 +62,10 @@ local function packageItems(ev, greater)
         else
           cantAfford = true
         end
+      else
+        PriceTag.remove(itm)
+        table.insert(packageContents, itm)
+        chestColor = chestColor or getChestColor(itm)
       end
     else
       table.insert(packageContents, itm)
