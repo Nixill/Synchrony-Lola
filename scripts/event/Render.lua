@@ -65,7 +65,8 @@ Event.render.add("outlineClaimedItems", { order = "outlines", sequence = 1 },
 
       -- Only outline items that are actually on the floor and revealed.
       if not item.gameObject.tangible
-          or not item.visibility.fullyVisible then
+          or not item.visibility.fullyVisible
+          or (item.itemSlot and item.itemSlot.name == "follower") then
         goto continue
       end
 
