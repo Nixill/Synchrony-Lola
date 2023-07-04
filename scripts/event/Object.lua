@@ -161,7 +161,7 @@ local function collectItems()
       for i, itm in ipairs(RevealedItems.getRevealedItems(e)) do
         local sc = itm.item.singleChoice
 
-        if sc == 0 then
+        if sc ~= 0 then
           local list = singleChoices[sc] or {}
           table.insert(list, itm)
           singleChoices[sc] = list
