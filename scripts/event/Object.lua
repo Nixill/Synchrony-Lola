@@ -152,10 +152,34 @@ local function collectItems()
   -- Disable any Lola_forcedLowPercent they may have, then collect
   -- their listed items, before re-enabling.
   for e in Entities.entitiesWithComponents { "Lola_descentCollectItems", "controllable" } do
-    local singleChoices = {}
-
     if e.Lola_descentCollectItems.active then
+      local singleChoices = {}
+
       local holster = nil
+
+      -- Search for single-choice groups first
+      for i, itm in ipairs(RevealedItems.getRevealedItems(e)) do
+        local sc = itm.item.singleChoice
+
+        if sc == 0 then
+          local list = singleChoices[sc] or {}
+          table.insert(list, itm)
+          singleChoices[sc] = list
+        end
+      end
+
+      -- And for each group, pick an item to give.
+      for k, v in Utilities.sortedPairs(singleChoices) do
+        -- print("Single-choice:")
+        -- print(v)
+        local itm = RNG.choice(v, channel(e))
+
+        for i, v2 in ipairs(v) do
+          singleChoices[v2.id] = false
+        end
+
+        singleChoices[itm.id] = true
+      end
 
       -- Search for holsters
       -- caching them saves some computations later
@@ -173,8 +197,7 @@ local function collectItems()
         -- print(itm.name)
         -- print("Revealed by player #" .. itm.Lola_revealedBy.playerID)
 
-        local sc = itm.item.singleChoice
-        if sc == 0 then
+        if itm.item.singleChoice == 0 or singleChoices[itm.id] then
           if itm.itemSlot then
             -- print("Holster swap initiated")
             local slot = itm.itemSlot.name
@@ -188,31 +211,7 @@ local function collectItems()
           Inventory.add(itm, e)
           LowPercent.negate(e, itm)
           -- print("Item added!")
-        else
-          -- print("Single-choice " .. sc .. " found, adding there!")
-          local list = singleChoices[sc] or {}
-          table.insert(list, itm)
-          singleChoices[sc] = list
         end
-      end
-
-      for k, v in Utilities.sortedPairs(singleChoices) do
-        -- print("Single-choice:")
-        -- print(v)
-        local itm = RNG.choice(v, channel(e))
-
-        if itm.itemSlot then
-          -- print("Holster swap initiated")
-          local slot = itm.itemSlot.name
-          if not Inventory.hasSlotCapacity(e, slot, 1)
-              and holster
-              and holster.itemHolster.slot == slot then
-            Inventory.swapWithHolster(e, holster)
-          end
-        end
-
-        Inventory.add(itm, e)
-        LowPercent.negate(e, itm)
       end
 
       if e.Lola_forcedLowPercent then
