@@ -156,8 +156,6 @@ local function collectItems()
       local singleChoices = {}
       local singleChoiceResults = {}
 
-      local holster = nil
-
       -- Search for single-choice groups first
       for i, itm in ipairs(RevealedItems.getRevealedItems(e)) do
         local sc = itm.item.singleChoice
@@ -180,11 +178,7 @@ local function collectItems()
 
       -- Search for holsters
       -- caching them saves some computations later
-      for i, v in ipairs(Inventory.getItems(e)) do
-        if v.itemHolster then
-          holster = v
-        end
-      end
+      -- But we need to remember to update this cache!
 
       if e.Lola_forcedLowPercent then
         e.Lola_forcedLowPercent.active = false
@@ -198,10 +192,12 @@ local function collectItems()
           if itm.itemSlot then
             -- print("Holster swap initiated")
             local slot = itm.itemSlot.name
-            if not Inventory.hasSlotCapacity(e, slot, 1)
-                and holster
-                and holster.itemHolster.slot == slot then
-              Inventory.swapWithHolster(e, holster)
+            if not Inventory.hasSlotCapacity(e, slot, 1) then
+              for i2, v in ipairs(Inventory.getItems(e)) do
+                if v.itemHolster and v.itemHolster.slot == slot then
+                  Inventory.swapWithHolster(e, v)
+                end
+              end
             end
           end
 
