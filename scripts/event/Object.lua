@@ -154,6 +154,7 @@ local function collectItems()
   for e in Entities.entitiesWithComponents { "Lola_descentCollectItems", "controllable" } do
     if e.Lola_descentCollectItems.active then
       local singleChoices = {}
+      local singleChoiceResults = {}
 
       local holster = nil
 
@@ -174,11 +175,7 @@ local function collectItems()
         -- print(v)
         local itm = RNG.choice(v, channel(e))
 
-        for i, v2 in ipairs(v) do
-          singleChoices[v2.id] = false
-        end
-
-        singleChoices[itm.id] = true
+        singleChoiceResults[itm.id] = true
       end
 
       -- Search for holsters
@@ -197,7 +194,7 @@ local function collectItems()
         -- print(itm.name)
         -- print("Revealed by player #" .. itm.Lola_revealedBy.playerID)
 
-        if itm.item.singleChoice == 0 or singleChoices[itm.id] then
+        if itm.item.singleChoice == 0 or singleChoiceResults[itm.id] then
           if itm.itemSlot then
             -- print("Holster swap initiated")
             local slot = itm.itemSlot.name
