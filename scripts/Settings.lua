@@ -5,6 +5,8 @@ local PowerSettings = require "PowerSettings.PowerSettings"
 
 local LoEnum = require "Lola.Enum"
 
+local Text = require "Lola.i18n.Text"
+
 PowerSettings.autoRegister()
 PowerSettings.saveVersionNumber()
 
@@ -32,7 +34,7 @@ end
 local function infiniteFormatter(inf)
   return function(value)
     if value == inf then
-      return "Infinite"
+      return Text.Infinite
     else
       return tostring(value)
     end
@@ -170,7 +172,7 @@ PowerSettings.shared.bool {
   name = "Greater Package enemies",
   order = 1,
   id = "silly.packageEnemies",
-  desc = "Enemies can be captured by Greater Package (except minibosses and bosses)"
+  desc = "Enemies can be captured by Greater Package"
 }
 
 PowerSettings.entitySchema.bool {
