@@ -59,6 +59,9 @@ function module.reset(item)
     return nil
   end
 
+  -- Unmark the item as safe, if it was marked as such.
+  item.Lola_holders.safe = false
+
   -- Get the old list of holders. We'll return it.
   local oldHolders = Utilities.deepCopy(item.Lola_holders.playerIDs)
 
@@ -111,7 +114,7 @@ function module.checkPID(item, playerID)
     return nil
   end
 
-  return not not item.Lola_holders.playerIDs[playerID]
+  return item.Lola_holders.safe or not not item.Lola_holders.playerIDs[playerID]
 end
 
 -- Check whether an item was held by any of the players.
@@ -128,6 +131,8 @@ function module.checkAllPIDs(item, playerIDs)
       and item.Lola_holders) then
     return nil
   end
+
+  if item.Lola_holders.safe then return true end
 
   for k in pairs(playerIDs) do
     if item.Lola_holders.playerIDs[k] then

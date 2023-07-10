@@ -39,8 +39,11 @@ Components.register {
   --
   -- The component is reset to the current holder only at the start of
   -- each floor.
+  --
+  -- If safe is true, all players are treated as holders.
   Lola_holders = {
-    Components.field.table("playerIDs", {})
+    Components.field.table("playerIDs", {}),
+    Components.field.bool("safe", false)
   },
 
   -- This component is given to any entity with storage.
