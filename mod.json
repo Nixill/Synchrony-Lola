@@ -1,7 +1,7 @@
 {
 	"namespace": "Lola",
 	"displayName": "Lola",
-	"version": "1.1.4",
+	"version": "1.1.5",
 	"synchronyVersion": "3.7.1",
 	"description": "Character who must pick up items indirectly",
 	"author": "Nixill",
@@ -15,6 +15,6 @@
 	"homepageURL": "https://mod.io/g/crypt/m/lola",
 	"modioID": "3105669",
 	"modioUserID": 12939888,
-	"pendingVersion": "1.1.4",
+	"pendingVersion": "1.1.5",
 	"visibility": 0
 }

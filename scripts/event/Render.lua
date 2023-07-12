@@ -11,6 +11,8 @@ local Utilities     = require "system.utils.Utilities"
 
 local ItemHolders = require "Lola.mod.ItemHolders"
 
+local NELoaded, NecroEdit = pcall(require, "NecroEdit.NecroEdit")
+
 local BLUE   = Color.rgb(43, 66, 180)
 local GREEN  = Color.rgb(66, 180, 43)
 local SILVER = Color.rgb(150, 150, 150)
@@ -18,7 +20,7 @@ local YELLOW = Color.rgb(180, 157, 43)
 
 Event.render.add("outlineClaimedItems", { order = "outlines", sequence = 1 },
   function(ev)
-    if CurrentLevel.isLobby() then return end
+    if CurrentLevel.isLobby() or (NELoaded and NecroEdit.isActive()) then return end
 
     local focus = Focus.getAll()
     local focusPIDs = {}
