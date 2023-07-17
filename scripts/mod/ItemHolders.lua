@@ -5,8 +5,11 @@ local Utilities = require "system.utils.Utilities"
 local module = {}
 
 local function entity(arg)
-  if type(arg) == "number" then return Entities.getEntityByID(arg)
-  else return arg end
+  if type(arg) == "number" then
+    return Entities.getEntityByID(arg)
+  else
+    return arg
+  end
 end
 
 -- Add a player to an item's holder list. If the item is already marked as

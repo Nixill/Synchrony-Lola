@@ -22,7 +22,7 @@ local function channel(player)
   local ent = player.Lola_descentCollectItems.randomizer
 
   if ent == nil then
-    ent = Entities.spawn("Lola_Randomizer")
+    ent = Entities.spawn "Lola_Randomizer"
     player.Lola_descentCollectItems.randomizer = ent
   end
 
@@ -103,22 +103,24 @@ Event.objectTryCollectItem.add("itemDeath",
     -- The player should NOT die if:
     -- 1. We're in the lobby
     if CurrentLevel.isLobby()
-        -- 2. The item pickup isn't successful
-        or ev.result ~= ItemPickup.Result.SUCCESS
-        -- 3. The player doesn't have forced low% active
-        or not source.Lola_forcedLowPercent.active
-        -- 4. The target item doesn't negate low%
-        or not (target.itemNegateLowPercent
-            and target.itemNegateLowPercent.active)
-        -- 5. The player doesn't have a low% component
-        or not source.lowPercent
-        -- 6. The player's low% component explicitly allows the item
-        or source.lowPercent.allowedItems[target.name]
-        -- 7. The player's forced low% component explicitly allows the item
-        or source.Lola_forcedLowPercent.allowedItems[target.name]
-        -- 8. The player has held the item
-        or ItemHolders.check(target, source)
-    then return end
+      -- 2. The item pickup isn't successful
+      or ev.result ~= ItemPickup.Result.SUCCESS
+      -- 3. The player doesn't have forced low% active
+      or not source.Lola_forcedLowPercent.active
+      -- 4. The target item doesn't negate low%
+      or not (target.itemNegateLowPercent
+        and target.itemNegateLowPercent.active)
+      -- 5. The player doesn't have a low% component
+      or not source.lowPercent
+      -- 6. The player's low% component explicitly allows the item
+      or source.lowPercent.allowedItems[target.name]
+      -- 7. The player's forced low% component explicitly allows the item
+      or source.Lola_forcedLowPercent.allowedItems[target.name]
+      -- 8. The player has held the item
+      or ItemHolders.check(target, source)
+    then
+      return
+    end
 
     ev.result = ItemPickup.Result.FAILURE
     ev.count = 0

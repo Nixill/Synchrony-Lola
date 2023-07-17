@@ -37,7 +37,7 @@ function module.mark(revealer, item)
   -- topmost entity in a possession chain)
   if GameDLC.isSynchronyLoaded() then
     while revealer.Sync_possessable
-        and revealer.Sync_possessable.possessor ~= 0 do
+      and revealer.Sync_possessable.possessor ~= 0 do
       revealer = Entities.getEntityByID(revealer.Sync_possessable.possessor)
     end
   end

@@ -16,9 +16,12 @@ local RevealedItems = require "Lola.mod.RevealedItems"
 local LoSettings = require "Lola.Settings"
 
 local function getChestColor(itm)
-  if itm.itemPoolRedChest then return "Red"
-  elseif itm.itemPoolBlackChest then return "Black"
-  elseif itm.itemPoolPurpleChest then return "Purple"
+  if itm.itemPoolRedChest then
+    return "Red"
+  elseif itm.itemPoolBlackChest then
+    return "Black"
+  elseif itm.itemPoolPurpleChest then
+    return "Purple"
   end
 end
 
@@ -87,7 +90,7 @@ local function packageItems(ev, greater)
 
   local pType = (greater and (#packageContents > 0) and "Chest" .. (chestColor or "Red")) or "Crate"
 
-  if greater and LoSettings.get("silly.packageEnemies") then
+  if greater and LoSettings.get "silly.packageEnemies" then
     for ent in SpellTargeting.targetsWithComponent(ev, "enemy") do
       -- Make sure it's on the same tile (or a tile hasn't been set)
       if x then
