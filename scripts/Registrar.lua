@@ -160,10 +160,10 @@ CustomEntities.extend {
     },
     textCharacterSelectionMessage = {
       text = "Lola mode!\n"
-          .. "Low% rules apply.\n"
-          .. "Receive revealed items (from\n"
-          .. "chests, crates, etc.) when\n"
-          .. "done with the floor!"
+        .. "Low% rules apply.\n"
+        .. "Receive revealed items (from\n"
+        .. "chests, crates, etc.) when\n"
+        .. "done with the floor!"
     }
   }, {
     sprite = {

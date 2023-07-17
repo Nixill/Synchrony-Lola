@@ -67,8 +67,8 @@ Event.render.add("outlineClaimedItems", { order = "outlines", sequence = 1 },
 
       -- Only outline items that are actually on the floor and revealed.
       if not item.gameObject.tangible
-          or not item.visibility.fullyVisible
-          or (item.itemSlot and item.itemSlot.name == "follower") then
+        or not item.visibility.fullyVisible
+        or (item.itemSlot and item.itemSlot.name == "follower") then
         goto continue
       end
 
@@ -86,7 +86,7 @@ Event.render.add("outlineClaimedItems", { order = "outlines", sequence = 1 },
             color = YELLOW
           end
         elseif item.Lola_revealedBy.playerID ~= 0
-            and Player.getPlayerEntity(item.Lola_revealedBy.playerID).Lola_descentCollectItems then
+          and Player.getPlayerEntity(item.Lola_revealedBy.playerID).Lola_descentCollectItems then
           color = SILVER
         end
       elseif not item.itemCurrency then
