@@ -62,7 +62,7 @@ PowerSettings.shared.action {
   desc = "Lola's default rules",
   order = 0,
   action = function()
-    setPreset({})
+    setPreset {}
     Menu.close()
   end
 }
@@ -73,14 +73,15 @@ PowerSettings.shared.action {
   desc = "Classic rules: Nix's first clear",
   order = 1,
   action = function()
-    setPreset({
+    setPreset {
       ["mod.Lola.gameplay.package"] = LoEnum.PackageSetting.NONE,
       ["mod.Lola.gameplay.bombs"] = 3,
       ["mod.Lola.gameplay.storageVision"] = false,
       ["mod.Lola.gameplay.glass"] = false,
       ["mod.Lola.gameplay.shrine"] = false,
-      ["mod.Lola.gameplay.transaction"] = false
-    })
+      ["mod.Lola.gameplay.transaction"] = false,
+      ["mod.Lola.silly.packageEnemies"] = false
+    }
     Menu.close()
   end
 }
@@ -172,7 +173,8 @@ PowerSettings.shared.bool {
   name = "Greater Package enemies",
   order = 1,
   id = "silly.packageEnemies",
-  desc = "Enemies can be captured by Greater Package"
+  desc = "Enemies can be captured by Greater Package",
+  default = true
 }
 
 PowerSettings.entitySchema.bool {
