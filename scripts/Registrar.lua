@@ -96,6 +96,13 @@ CustomEntities.extend {
   template = CustomEntities.template.player(),
   name = "Lola_Lola",
   components = { {
+    InGameAchievements_allZonesAchievement = {
+      data = {
+        hidden = true,
+        canUnlock = false,
+        version = 3
+      }
+    },
     Lola_descentCollectItems = {},
     Lola_forcedLowPercent = {
       allowedItems = {
