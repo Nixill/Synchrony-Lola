@@ -181,10 +181,6 @@ local function collectItems()
         singleChoiceResults[itm.id] = true
       end
 
-      if e.Lola_forcedLowPercent then
-        e.Lola_forcedLowPercent.active = false
-      end
-
       for i, itm in ipairs(RevealedItems.getRevealedItems(e)) do
         -- print(itm.name)
         -- print("Revealed by player #" .. itm.Lola_revealedBy.playerID)
@@ -208,12 +204,6 @@ local function collectItems()
           -- print("Item added!")
         end
       end
-
-      if e.Lola_forcedLowPercent then
-        e.Lola_forcedLowPercent.active = true
-      end
-    else
-      e.Lola_descentCollectItems.active = true
     end
   end
 end
