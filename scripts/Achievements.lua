@@ -1,12 +1,21 @@
 local Event              = require "necro.event.Event"
 local LeaderboardContext = require "necro.client.leaderboard.LeaderboardContext"
+local Snapshot           = require "necro.game.system.Snapshot"
 local Utilities          = require "system.utils.Utilities"
-
-local LoEnum = require "Lola.Enum"
 
 local hasIGA, IGA = pcall(require, "InGameAchievements.api")
 
-if not hasIGA then return end
+if not hasIGA then
+  return setmetatable({}, {
+    __index = function(t, k)
+      return function() return end
+    end
+  })
+end
+
+-----------------------------
+-- ACHIEVEMENT DEFINITIONS --
+--#region--------------------
 
 local defaultRulesAch = IGA.register {
   id = "Lola_DefaultRulesClear", -- For backwards compatibility with existing unlocks
@@ -29,6 +38,23 @@ local classicRulesAch = IGA.register {
   sortOrder = IGA.sortOrder.ALL_ZONES_SPECIAL
 }
 
+local noRejectsAch = IGA.register {
+  id = "Lola_NoRejectsClear",
+  version = 1,
+  friendlyName = "Lola the Adaptible",
+  desc = "Clear a solo Lola run using either preset ruleset, without rejecting items!\n" ..
+    "(Do not destroy or repackage claimed items, or skip collection with trapdoors.)",
+  descShort = "Lola Clear without rejecting items!",
+  icon = "mods/Lola/gfx/achievement_adaptible.png",
+  sortOrder = IGA.sortOrder.ALL_ZONES_SPECIAL
+}
+
+--#endregion ACHIEVEMENT DEFINITIONS
+
+---------------
+-- FUNCTIONS --
+--#region------
+
 local function check(rules, rule, value, nillable)
   local val = rules["mod.Lola." .. rule]
   if rules["mod.Lola." .. rule] == value then
@@ -38,6 +64,20 @@ local function check(rules, rule, value, nillable)
   end
   return false
 end
+
+--#endregion FUNCTIONS
+
+---------------
+-- SNAPSHOTS --
+--#region------
+
+ShownItems = Snapshot.runVariable({})
+
+--#endregion SNAPSHOTS
+
+--------------------
+-- EVENT HANDLERS --
+--#region-----------
 
 Event.runComplete.add("unlockLolaAchievement", { order = "leaderboardSubmission", sequence = 1 }, function(ev)
   local ctx = LeaderboardContext.getFinalRunContext()
@@ -94,4 +134,44 @@ Event.runComplete.add("unlockLolaAchievement", { order = "leaderboardSubmission"
   if classicRulesMet then
     classicRulesAch.unlock()
   end
+
+  if defaultRulesMet or classicRulesMet then
+    for k, v in pairs(ShownItems) do
+      if v == false then
+        goto noRejectsFail
+      end
+    end
+
+    noRejectsAch.unlock()
+  end
+
+  ::noRejectsFail::
 end)
+
+--#endregion EVENT HANDLERS
+
+-- defaultRulesAch.revoke()
+-- classicRulesAch.revoke()
+-- noRejectsAch.revoke()
+
+------------
+-- MODULE --
+--#region---
+
+local mdl = {}
+
+function mdl.trackItem(id)
+  ShownItems[id] = false
+end
+
+function mdl.collectItem(id)
+  ShownItems[id] = true
+end
+
+function mdl.untrackItem(id)
+  ShownItems[id] = nil
+end
+
+return mdl
+
+---#endregion MODULE

@@ -14,6 +14,8 @@ local Utilities    = require "system.utils.Utilities"
 local ItemHolders   = require "Lola.mod.ItemHolders"
 local RevealedItems = require "Lola.mod.RevealedItems"
 
+local LoAchievements = require "Lola.Achievements"
+
 local function channel(player)
   if GameDLC.isSynchronyLoaded() and player.Sync_possessable then
     player = Entities.getEntityByID(player.Sync_possessable.possessor)
@@ -166,6 +168,7 @@ local function collectItems()
           local list = singleChoices[sc] or {}
           table.insert(list, itm)
           singleChoices[sc] = list
+          LoAchievements.untrackItem(itm.id)
         end
       end
 
@@ -177,10 +180,6 @@ local function collectItems()
 
         singleChoiceResults[itm.id] = true
       end
-
-      -- Search for holsters
-      -- caching them saves some computations later
-      -- But we need to remember to update this cache!
 
       if e.Lola_forcedLowPercent then
         e.Lola_forcedLowPercent.active = false
@@ -205,6 +204,7 @@ local function collectItems()
 
           Inventory.add(itm, e)
           LowPercent.negate(e, itm)
+          LoAchievements.collectItem(itm.id)
           -- print("Item added!")
         end
       end

@@ -3,6 +3,7 @@ local Event = require "necro.event.Event"
 local RevealedItems = require "Lola.mod.RevealedItems"
 
 local LoSettings = require "Lola.Settings"
+local LoAchievements = require "Lola.Achievements"
 
 local transactionBy = nil
 
@@ -24,6 +25,7 @@ Event.objectSpawn.add("transactionItems", { order = "overrides", filter = "Lola_
   function(ev)
     if transactionBy and LoSettings.get("gameplay.transaction") then
       RevealedItems.mark(transactionBy, ev.entity)
+      LoAchievements.trackItem(ev.entity)
     end
   end
 )

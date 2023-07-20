@@ -8,8 +8,7 @@ local ItemPickup   = require "necro.game.item.ItemPickup"
 local LowPercent   = require "necro.game.item.LowPercent"
 local Object       = require "necro.game.object.Object"
 
-local ItemHolders   = require "Lola.mod.ItemHolders"
-local RevealedItems = require "Lola.mod.RevealedItems"
+local ItemHolders = require "Lola.mod.ItemHolders"
 
 Event.levelLoad.add("heldItemsSafe", { order = "initialItems", sequence = 1 },
   function(ev)
