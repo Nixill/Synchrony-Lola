@@ -18,7 +18,7 @@ end
 --#region--------------------
 
 local defaultRulesAch = IGA.register {
-  id = "Lola_DefaultRulesClear", -- For backwards compatibility with existing unlocks
+  id = "InGameAchievements_AUTOGENALLZONES_Lola_Lola", -- For backwards compatibility with existing unlocks
   version = 1,
   friendlyName = "Lola the Lucky",
   desc = "Clear a solo Lola all zones run with Default Rules!",
@@ -31,8 +31,8 @@ local classicRulesAch = IGA.register {
   id = "Lola_ClassicRulesClear",
   version = 1,
   friendlyName = "Lola the Persistent",
-  desc =
-  "Clear a solo Lola all zones run with Classic Rules!\n(Pause > Customize > Custom rules > Lola > Presets > Classic Rules)",
+  desc = "Clear a solo Lola all zones run with Classic Rules!\n" ..
+    "(Pause > Customize > Custom rules > Mod options > Lola > Use a preset > Classic Rules)",
   descShort = "Solo Lola Classic Rules clear!",
   icon = "mods/Lola/gfx/achievement_classic_rules.png",
   sortOrder = IGA.sortOrder.ALL_ZONES_SPECIAL
