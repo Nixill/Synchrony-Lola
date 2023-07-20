@@ -117,8 +117,8 @@ CustomEntities.extend {
       }
     },
     bestiary = {
-      focusX = 297,
-      focusY = 169,
+      focusX = 170,
+      focusY = 120,
       image = "mods/Lola/gfx/lola_bestiary.png"
     },
     forceNonSilhouetteVision = {
