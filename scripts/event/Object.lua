@@ -146,7 +146,7 @@ Event.objectTryCollectItem.add("itemDeath",
 Event.objectDeath.add("dontCollectOnDeath",
   { order = "dead", filter = "Lola_descentCollectItems", sequence = 1 },
   function(ev)
-    ev.entity.Lola_descentCollectItems.active = false
+    RevealedItems.unmarkAll(ev.entity)
   end
 )
 --#endregion
@@ -226,7 +226,7 @@ Event.objectDescentEnd.add("descent",
 
     -- If not stairs, no collecting items.
     if ev.type ~= Descent.Type.STAIRS and ev.entity.Lola_descentCollectItems then
-      ev.entity.Lola_descentCollectItems.active = false
+      RevealedItems.unmarkAll(ev.entity)
     end
 
     -- Also, if this is the last one to exit, we should collect items and

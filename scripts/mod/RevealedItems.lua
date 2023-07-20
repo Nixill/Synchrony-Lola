@@ -113,4 +113,19 @@ function module.getRevealedItemsPID(playerID)
   return module.getRevealedItems(Player.getPlayerEntity(playerID))
 end
 
+-- Unclaims all items a player had claimed.
+--
+-- player may be passed as an entity table or ID.
+function module.unmarkAll(player)
+  for i, v in ipairs(module.getRevealedItems(player)) do
+    module.unmark(v)
+  end
+end
+
+function module.unmarkAllPID(playerID)
+  for i, v in ipairs(module.getRevealedItemsPID(playerID)) do
+    module.unmark(v)
+  end
+end
+
 return module
