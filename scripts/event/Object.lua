@@ -15,6 +15,7 @@ local ItemHolders   = require "Lola.mod.ItemHolders"
 local RevealedItems = require "Lola.mod.RevealedItems"
 
 local LoAchievements = require "Lola.Achievements"
+local LoSettings     = require "Lola.Settings"
 
 local function channel(player)
   if GameDLC.isSynchronyLoaded() and player.Sync_possessable then
@@ -146,7 +147,9 @@ Event.objectTryCollectItem.add("itemDeath",
 Event.objectDeath.add("dontCollectOnDeath",
   { order = "dead", filter = "Lola_descentCollectItems", sequence = 1 },
   function(ev)
-    RevealedItems.unmarkAll(ev.entity)
+    if LoSettings.get("multiplayer.death") then
+      RevealedItems.unmarkAll(ev.entity)
+    end
   end
 )
 --#endregion

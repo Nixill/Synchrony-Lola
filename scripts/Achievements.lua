@@ -111,6 +111,9 @@ Event.runComplete.add("unlockLolaAchievement", { order = "leaderboardSubmission"
     and check(rules, "gameplay.glass", true, true)
     and check(rules, "gameplay.shrine", true, true)
     and check(rules, "gameplay.transaction", true, true)
+    -- multiplayer.death is ignored; this achievement may be earned with
+    -- either value. (That setting has no effect on singleplayer runs,
+    -- which are a prerequisite for achievements anyway.)
     -- silly.packageEnemies is ignored; this achievement may be earned
     -- with either value.
     and check(rules, "silly.luteMode", false, true)
@@ -127,6 +130,9 @@ Event.runComplete.add("unlockLolaAchievement", { order = "leaderboardSubmission"
     and check(rules, "gameplay.glass", false)
     and check(rules, "gameplay.shrine", false)
     and check(rules, "gameplay.transaction", false)
+    -- multiplayer.death is ignored; this achievement may be earned with
+    -- either value. (That setting has no effect on singleplayer runs,
+    -- which are a prerequisite for achievements anyway.)
     and check(rules, "silly.packageEnemies", false)
     and check(rules, "silly.luteMode", false, true)
   )

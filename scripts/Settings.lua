@@ -1,5 +1,8 @@
 local Menu            = require "necro.menu.Menu"
 local SettingsStorage = require "necro.config.SettingsStorage"
+local SinglePlayer    = require "necro.client.SinglePlayer"
+
+local NixLib = require "NixLib.NixLib"
 
 local PowerSettings = require "PowerSettings.PowerSettings"
 
@@ -43,6 +46,16 @@ end
 
 --#endregion FORMATTERS
 
+----------------
+-- CONDITIONS --
+--#region-------
+
+local function notSingleplayer()
+  return not SinglePlayer.isActive()
+end
+
+--#endregion CONDITIONS
+
 --------------
 -- SETTINGS --
 --#region-----
@@ -80,6 +93,7 @@ PowerSettings.shared.action {
       ["mod.Lola.gameplay.glass"] = false,
       ["mod.Lola.gameplay.shrine"] = false,
       ["mod.Lola.gameplay.transaction"] = false,
+      ["mod.Lola.multiplayer.death"] = true,
       ["mod.Lola.silly.packageEnemies"] = false
     }
     Menu.close()
@@ -154,6 +168,27 @@ PowerSettings.shared.bool {
 
 --#endregion Gameplay (section)
 
+PowerSettings.group {
+  name = "Multiplayer settings",
+  desc = "Settings that only affect the multiplayer game.",
+  id = "multiplayer",
+  order = 3,
+  visibleIf = notSingleplayer
+}
+
+--#region Multiplayer (section)
+
+PowerSettings.shared.bool {
+  name = "Death unclaims items",
+  desc = "In multiplayer, should a dead Lola skip collecting items at the end of the floor?",
+  id = "multiplayer.death",
+  order = 1,
+  visibleIf = notSingleplayer,
+  default = false
+}
+
+--#endregion Multiplayer (section)
+
 -- PowerSettings.shared.label {
 --   name = "",
 --   order = 9,
@@ -163,7 +198,7 @@ PowerSettings.shared.bool {
 
 PowerSettings.shared.group {
   name = "Silly settings",
-  order = 3,
+  order = 4,
   id = "silly"
 }
 
