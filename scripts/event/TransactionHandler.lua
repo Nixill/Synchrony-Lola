@@ -25,7 +25,7 @@ Event.objectSpawn.add("transactionItems", { order = "overrides", filter = "Lola_
   function(ev)
     if transactionBy and LoSettings.get("gameplay.transaction") then
       RevealedItems.mark(transactionBy, ev.entity)
-      LoAchievements.trackItem(ev.entity)
+      LoAchievements.trackItem(ev.entity.id)
     end
   end
 )
