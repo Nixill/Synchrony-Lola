@@ -80,7 +80,7 @@ Event.objectInteract.add("chestRevealer",
 
 --#region objectTakeDamge{storage} → crateAttacker
 Event.objectTakeDamage.add("crateAttacker",
-  { order = "armorMinimumDamage", filter = "storage", sequence = -1 },
+  { order = "armorMinimumDamage", filter = "Lola_interactedBy", sequence = -1 },
   function(ev)
     local source = ev.attacker
     local target = ev.victim
