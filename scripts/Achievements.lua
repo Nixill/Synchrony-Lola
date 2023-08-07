@@ -1,4 +1,5 @@
 local Event              = require "necro.event.Event"
+local Fallback           = require "system.utils.Fallback"
 local LeaderboardContext = require "necro.client.leaderboard.LeaderboardContext"
 local Snapshot           = require "necro.game.system.Snapshot"
 local Utilities          = require "system.utils.Utilities"
@@ -6,11 +7,7 @@ local Utilities          = require "system.utils.Utilities"
 local hasIGA, IGA = pcall(require, "InGameAchievements.api")
 
 if not hasIGA then
-  return setmetatable({}, {
-    __index = function(t, k)
-      return function() return end
-    end
-  })
+  return Fallback.create()
 end
 
 -----------------------------
