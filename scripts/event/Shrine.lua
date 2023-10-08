@@ -2,9 +2,9 @@ local Event   = require "necro.event.Event"
 local GameDLC = require "necro.game.data.resource.GameDLC"
 
 local RevealedItems = require "Lola.mod.RevealedItems"
+local ShownItems    = require "Lola.mod.ShownItems"
 
 local LoSettings = require "Lola.Settings"
-local LoAchievements = require "Lola.Achievements"
 
 local shrineBy = nil
 
@@ -37,6 +37,6 @@ end
 Event.objectSpawn.add("shrineDetected", { order = "overrides", filter = "Lola_revealedBy" }, function(ev)
   if shrineBy and LoSettings.get("gameplay.shrine") then
     RevealedItems.mark(shrineBy, ev.entity)
-    LoAchievements.trackItem(ev.entity.id)
+    ShownItems.trackItem(ev.entity.id)
   end
 end)

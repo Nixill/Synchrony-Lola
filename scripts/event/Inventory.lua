@@ -2,9 +2,9 @@ local Event = require "necro.event.Event"
 
 local ItemHolders   = require "Lola.mod.ItemHolders"
 local RevealedItems = require "Lola.mod.RevealedItems"
+local ShownItems    = require "Lola.mod.ShownItems"
 
 local LoSettings = require "Lola.Settings"
-local LoAchievements = require "Lola.Achievements"
 
 Event.inventoryAddItem.add("untrack", { order = "unmap", sequence = 1 },
   function(ev)
@@ -42,7 +42,7 @@ Event.storageDetach.add("itemTracker", { order = "item", sequence = 1 },
     if ev.suppressed or (not entity.itemNegateLowPercent) or container.Lola_interactedBy.playerID == 0 then return end
 
     RevealedItems.markPID(container.Lola_interactedBy.playerID, entity)
-    LoAchievements.trackItem(entity.id)
+    ShownItems.trackItem(entity.id)
 
     -- print(entity.name .. " revealed by player " .. container.Lola_interactedBy.playerID)
   end

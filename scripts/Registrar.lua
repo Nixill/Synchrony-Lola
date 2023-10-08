@@ -55,6 +55,21 @@ Components.register {
     Components.field.int("playerID", 0)
   },
 
+  -- Adds to this entity's frameX depending on facing direction, allowing
+  -- some directions to not change or reset.
+  --
+  -- const table frameX: Maps direction → frameX offset.
+  -- const table ignored: Maps direction → true; facing directions
+  --   specified here will use the last frameX offset specified in frameX.
+  -- enum lastFacing: The last non-ignored direction this entity was
+  --   facing; this should be given a default that matches one of the
+  --   frameX directions and not changed by mods during gameplay.
+  Lola_partialDirectionalSpriteChange = {
+    Components.constant.table("frameX", {}),
+    Components.constant.table("ignored", {}),
+    Components.field.enum("lastFacing", Direction, Direction.RIGHT)
+  },
+
   -- This component is given to any item that can negate low%.
   --
   -- If the item is revealed from a crate, chest, or shrine, or the result
@@ -105,7 +120,7 @@ CustomEntities.extend {
         MiscPotion = true
       }
     },
-    NixLib_partialDirectionalSpriteChange = {
+    Lola_partialDirectionalSpriteChange = {
       frameX = {
         [Direction.UP_LEFT] = 16,
         [Direction.LEFT] = 16,

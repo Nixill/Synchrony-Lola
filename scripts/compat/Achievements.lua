@@ -4,10 +4,12 @@ local LeaderboardContext = require "necro.client.leaderboard.LeaderboardContext"
 local Snapshot           = require "necro.game.system.Snapshot"
 local Utilities          = require "system.utils.Utilities"
 
+local ShownItems = require "Lola.mod.ShownItems"
+
 local hasIGA, IGA = pcall(require, "InGameAchievements.api")
 
 if not hasIGA then
-  return Fallback.create()
+  return
 end
 
 -----------------------------
@@ -63,14 +65,6 @@ local function check(rules, rule, value, nillable)
 end
 
 --#endregion FUNCTIONS
-
----------------
--- SNAPSHOTS --
---#region------
-
-ShownItems = Snapshot.runVariable({})
-
---#endregion SNAPSHOTS
 
 --------------------
 -- EVENT HANDLERS --
@@ -139,16 +133,10 @@ Event.runComplete.add("unlockLolaAchievement", { order = "leaderboardSubmission"
   end
 
   if defaultRulesMet or classicRulesMet then
-    for k, v in pairs(ShownItems) do
-      if v == false then
-        goto noRejectsFail
-      end
+    if not ShownItems.hasUncollectedItems() then
+      noRejectsAch.unlock()
     end
-
-    noRejectsAch.unlock()
   end
-
-  ::noRejectsFail::
 end)
 
 --#endregion EVENT HANDLERS
@@ -156,25 +144,3 @@ end)
 -- defaultRulesAch.revoke()
 -- classicRulesAch.revoke()
 -- noRejectsAch.revoke()
-
-------------
--- MODULE --
---#region---
-
-local mdl = {}
-
-function mdl.trackItem(id)
-  ShownItems[id] = false
-end
-
-function mdl.collectItem(id)
-  ShownItems[id] = true
-end
-
-function mdl.untrackItem(id)
-  ShownItems[id] = nil
-end
-
-return mdl
-
----#endregion MODULE

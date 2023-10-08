@@ -13,9 +13,9 @@ local Utilities    = require "system.utils.Utilities"
 
 local ItemHolders   = require "Lola.mod.ItemHolders"
 local RevealedItems = require "Lola.mod.RevealedItems"
+local ShownItems    = require "Lola.mod.ShownItems"
 
-local LoAchievements = require "Lola.Achievements"
-local LoSettings     = require "Lola.Settings"
+local LoSettings = require "Lola.Settings"
 
 local function channel(player)
   if GameDLC.isSynchronyLoaded() and player.Sync_possessable then
@@ -171,7 +171,7 @@ local function collectItems()
           local list = singleChoices[sc] or {}
           table.insert(list, itm)
           singleChoices[sc] = list
-          LoAchievements.untrackItem(itm.id)
+          ShownItems.untrackItem(itm.id)
         end
       end
 
@@ -203,7 +203,7 @@ local function collectItems()
 
           Inventory.add(itm, e)
           LowPercent.negate(e, itm)
-          LoAchievements.collectItem(itm.id)
+          ShownItems.collectItem(itm.id)
           -- print("Item added!")
         end
       end
@@ -242,3 +242,18 @@ Event.objectDeath.add("deathCollectItems", { order = "descent", filter = "contro
   end
 )
 --#endregion
+
+--#region objectFacing{Lola_partialDirectionalSpriteChange} → updateFacing
+Event.objectFacing.add("updateFacing",
+  { order = "sprite", sequence = 1, filter = { "NixLib_partialDirectionalSpriteChange", "sprite" }
+  },
+  function(ev)
+    local pdsc = ev.entity.NixLib_partialDirectionalSpriteChange
+    if ev.visualDirection and not pdsc.ignored[ev.visualDirection] then
+      pdsc.lastFacing = ev.visualDirection
+    end
+  end
+)
+--#endregion
+
+-- end of file
