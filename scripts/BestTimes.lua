@@ -2,8 +2,6 @@ local Event    = require "necro.event.Event"
 local Menu     = require "necro.menu.Menu"
 local Settings = require "necro.config.Settings"
 
-local PowerSettings = require "PowerSettings.PowerSettings"
-
 ------------------
 -- Data Storage --
 --#region---------
@@ -51,12 +49,13 @@ ViewTimes = Settings.user.action {
 -- Best Times Menu --
 --#region------------
 
-Event.menu.add("Lola_bestTimes", "Lola_bestTimes", function(ev)
+Event.menu.add("bestTimes", "Lola_bestTimes", function(ev)
   local entries = {}
 
   local rules = {
     { id = "Default", name = "Default rules" },
-    { id = "Classic", name = "Classic rules" }
+    { id = "Classic", name = "Classic rules" },
+    { id = "Lute",    name = "Lute mode" }
   }
   local challenges = {
     { id = "",                 name = "" },

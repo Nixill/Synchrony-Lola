@@ -245,10 +245,10 @@ Event.objectDeath.add("deathCollectItems", { order = "descent", filter = "contro
 
 --#region objectFacing{Lola_partialDirectionalSpriteChange} → updateFacing
 Event.objectFacing.add("updateFacing",
-  { order = "sprite", sequence = 1, filter = { "NixLib_partialDirectionalSpriteChange", "sprite" }
+  { order = "sprite", sequence = 1, filter = { "Lola_partialDirectionalSpriteChange", "sprite" }
   },
   function(ev)
-    local pdsc = ev.entity.NixLib_partialDirectionalSpriteChange
+    local pdsc = ev.entity.Lola_partialDirectionalSpriteChange
     if ev.visualDirection and not pdsc.ignored[ev.visualDirection] then
       pdsc.lastFacing = ev.visualDirection
     end
