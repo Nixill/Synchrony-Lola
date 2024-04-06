@@ -1,9 +1,7 @@
 local Event              = require "necro.event.Event"
-local Fallback           = require "system.utils.Fallback"
 local LeaderboardContext = require "necro.client.leaderboard.LeaderboardContext"
-local Snapshot           = require "necro.game.system.Snapshot"
-local Utilities          = require "system.utils.Utilities"
 
+local RuleCheck = require "Lola.mod.RuleCheck"
 local ShownItems = require "Lola.mod.ShownItems"
 
 local hasIGA, IGA = pcall(require, "InGameAchievements.api")
@@ -71,71 +69,18 @@ end
 --#region-----------
 
 Event.runComplete.add("unlockLolaAchievement", { order = "leaderboardSubmission", sequence = 1 }, function(ev)
-  local ctx = LeaderboardContext.getFinalRunContext()
+  local followedRules = RuleCheck.getFollowedRules()
 
-  if
-    not ctx.completion.victory -- Only wins count
-    or #ctx.characters > 1 or ctx.characters[1] ~= "Lola_Lola" -- Only solo Lola runs count
-    or #ctx.customRules > 1 -- Runs don't count if rules change midway
-    or ctx.gameMode ~= "AllZones" -- Only All Zones runs count
-    or ctx.maximumPlayers > 1 -- Only singleplayer runs count
-    or #ctx.mods > 1 -- Runs don't count if mods change midway
-  then
-    return
-  end
-
-  local rules = ctx.customRules[1]
-
-  if
-    rules["gameplay.modifiers.dancepad"] -- Dance Pad mode doesn't count
-    or rules["gameplay.modifiers.phasing"] -- Phasing mode doesn't count
-    or rules["gameplay.modifiers.rhythm"] == "NO_BEAT" -- No beat mode doesn't count
-  then
-    return
-  end
-
-  -- We may be eligible for an achievement.
-  local defaultRulesMet = (
-    check(rules, "gameplay.package", "INNATE", true)
-    and check(rules, "gameplay.bombs", 1, true)
-    and check(rules, "gameplay.storageVision", true, true)
-    and check(rules, "gameplay.glass", true, true)
-    and check(rules, "gameplay.shrine", true, true)
-    and check(rules, "gameplay.transaction", true, true)
-    -- multiplayer.death is ignored; this achievement may be earned with
-    -- either value. (That setting has no effect on singleplayer runs,
-    -- which are a prerequisite for achievements anyway.)
-    -- silly.packageEnemies is ignored; this achievement may be earned
-    -- with either value.
-    and check(rules, "silly.luteMode", false, true)
-  )
-
-  if defaultRulesMet then
+  if followedRules.Default then
     defaultRulesAch.unlock()
   end
 
-  local classicRulesMet = (
-    check(rules, "gameplay.package", "NONE")
-    and check(rules, "gameplay.bombs", 3)
-    and check(rules, "gameplay.storageVision", false)
-    and check(rules, "gameplay.glass", false)
-    and check(rules, "gameplay.shrine", false)
-    and check(rules, "gameplay.transaction", false)
-    -- multiplayer.death is ignored; this achievement may be earned with
-    -- either value. (That setting has no effect on singleplayer runs,
-    -- which are a prerequisite for achievements anyway.)
-    and check(rules, "silly.packageEnemies", false)
-    and check(rules, "silly.luteMode", false, true)
-  )
-
-  if classicRulesMet then
+  if followedRules.Classic then
     classicRulesAch.unlock()
   end
 
-  if defaultRulesMet or classicRulesMet then
-    if not ShownItems.hasUncollectedItems() then
-      noRejectsAch.unlock()
-    end
+  if (followedRules.Default or followedRules.Classic) and followedRules.NoRejects then
+    noRejectsAch.unlock()
   end
 end)
 

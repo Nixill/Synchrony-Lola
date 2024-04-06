@@ -21,6 +21,20 @@ Event.shopkeeperTransaction.add("clearTransaction",
   end
 )
 
+Event.shopkeeperTransaction.add("setPawnbrokerTransaction",
+  { order = "payPrice", sequence = -1, filter = "transactionSellItem" },
+  function(ev)
+    transactionBy = ev.client
+  end
+)
+
+Event.shopkeeperTransaction.add("clearPawnbrokerTransaction",
+  { order = "payPrice", sequence = 2, filter = "transactionSellItem" },
+  function(ev)
+    transactionBy = nil
+  end
+)
+
 Event.objectSpawn.add("transactionItems", { order = "overrides", filter = "Lola_revealedBy" },
   function(ev)
     if transactionBy and LoSettings.get("gameplay.transaction") then

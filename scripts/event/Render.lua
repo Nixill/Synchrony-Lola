@@ -7,16 +7,67 @@ local OutlineFilter = require "necro.render.filter.OutlineFilter"
 local Player        = require "necro.game.character.Player"
 local PlayerList    = require "necro.client.PlayerList"
 local Render        = require "necro.render.Render"
+local Settings      = require "necro.config.Settings"
 local Utilities     = require "system.utils.Utilities"
 
 local ItemHolders = require "Lola.mod.ItemHolders"
 
 local NELoaded, NecroEdit = pcall(require, "NecroEdit.NecroEdit")
 
-local BLUE   = Color.rgb(43, 66, 180)
-local GREEN  = Color.rgb(66, 180, 43)
-local SILVER = Color.rgb(150, 150, 150)
-local YELLOW = Color.rgb(180, 157, 43)
+ColorGroup = Settings.user.group {
+  name = "Outline colors",
+  desc = "Modify color outlines for Lola",
+  order = 0,
+  id = "colors"
+}
+
+SafeItemColor = Settings.user.color {
+  name = "Safe items",
+  desc = "Items Lola can safely pick up",
+  default = Color.rgba(43, 66, 180, 255),
+  order = 0,
+  id = "colors.safe"
+}
+
+ClaimedItemColor = Settings.user.color {
+  name = "Claimed items",
+  desc = "Items Lola has claimed",
+  default = Color.rgba(66, 180, 43, 255),
+  order = 1,
+  id = "colors.claimed"
+}
+
+OtherClaimedItemColor = Settings.user.color {
+  name = "Other players' claimed items",
+  desc = "Items another Lola has claimed",
+  default = Color.rgba(150, 150, 150, 255),
+  order = 2,
+  id = "colors.other"
+}
+
+ChanceItemColor = Settings.user.color {
+  name = "Chance items",
+  desc = "Items Lola has claimed (when only one of a group)",
+  default = Color.rgba(180, 157, 43, 255),
+  order = 3,
+  id = "colors.chance"
+}
+
+DangerItemColor = Settings.user.color {
+  name = "Dangerous items",
+  desc = "Unclaimed items that will kill Lola upon contact",
+  default = Color.rgba(180, 43, 66, 255),
+  order = 4,
+  id = "colors.danger"
+}
+
+DangerShrineColor = Settings.user.color {
+  name = "Dangerous shrines",
+  desc = "Shrines that will kill Lola upon contact",
+  default = Color.rgba(180, 43, 66, 255),
+  order = 4,
+  id = "colors.dangerShrine"
+}
 
 Event.render.add("outlineClaimedItems", { order = "outlines", sequence = 1 },
   function(ev)
@@ -28,7 +79,7 @@ Event.render.add("outlineClaimedItems", { order = "outlines", sequence = 1 },
     -- Get focused players and their lowPercentAllowedItems
     local pids = {}
     local itms = {}
-    local blue = false
+    local redBlue = false
 
     -- Iterate all focused players
     for i, p in ipairs(focus) do
@@ -36,7 +87,7 @@ Event.render.add("outlineClaimedItems", { order = "outlines", sequence = 1 },
       if p.Lola_forcedLowPercent and p.Lola_forcedLowPercent.active then
         -- ... we can use blue rendering later. (This doesn't apply if no
         -- focused player is forced low%.)
-        blue = true
+        redBlue = true
 
         -- Also iterate their allowed items, so that we know *which* items
         -- to render blue.
@@ -72,25 +123,27 @@ Event.render.add("outlineClaimedItems", { order = "outlines", sequence = 1 },
         goto continue
       end
 
-      if blue and itms[item.name] then
-        color = BLUE
+      if redBlue and itms[item.name] then
+        color = SafeItemColor
       elseif ItemHolders.checkAllPIDs(item, pids) then
-        color = BLUE
+        color = SafeItemColor
       elseif item.Lola_revealedBy then
         if not (item.itemNegateLowPercent and item.itemNegateLowPercent.active) then
-          color = BLUE
+          color = SafeItemColor
         elseif pids[item.Lola_revealedBy.playerID] then
           if item.item.singleChoice == 0 then
-            color = GREEN
+            color = ClaimedItemColor
           else
-            color = YELLOW
+            color = ChanceItemColor
           end
         elseif item.Lola_revealedBy.playerID ~= 0
           and Player.getPlayerEntity(item.Lola_revealedBy.playerID).Lola_descentCollectItems then
-          color = SILVER
+          color = OtherClaimedItemColor
+        elseif redBlue then
+          color = DangerItemColor
         end
       elseif not item.itemCurrency then
-        color = BLUE
+        color = SafeItemColor
       end
 
       if color ~= nil then
@@ -101,6 +154,29 @@ Event.render.add("outlineClaimedItems", { order = "outlines", sequence = 1 },
       end
 
       ::continue::
+    end
+
+    for shrine in Entities.entitiesWithComponents { "interactableNegateLowPercent" } do
+      local color
+
+      -- Only outline shrines that are actually on the floor and revealed.
+      if not shrine.gameObject.tangible
+        or not shrine.visibility.fullyVisible then
+        goto continue2
+      end
+
+      if redBlue then
+        color = DangerShrineColor
+      end
+
+      if color ~= nil then
+        local visual = OutlineFilter.getEntityVisual(shrine)
+        visual.color = color
+        visual.z = visual.z - 1
+        Render.getBuffer(Render.Buffer.CUSTOM).draw(visual)
+      end
+
+      ::continue2::
     end
   end
 )
