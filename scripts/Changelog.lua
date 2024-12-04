@@ -9,7 +9,7 @@ Settings.user.action {
   autoRegister = true,
   action = function()
     Menu.open("changeLog", {
-      fileNames = { "1.3.0.md", "1.2.x.md", "1.2.0.md", "1.1.x.md" },
+      fileNames = { "1.3.x.md", "1.3.0.md", "1.2.x.md", "1.2.0.md", "1.1.x.md" },
       basePath = "mods/Lola/changelogs/",
       index = 1
     })

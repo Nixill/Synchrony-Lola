@@ -14,6 +14,8 @@ local ItemHolders = require "Lola.mod.ItemHolders"
 
 local NELoaded, NecroEdit = pcall(require, "NecroEdit.NecroEdit")
 
+local module = {}
+
 ColorGroup = Settings.user.group {
   name = "Outline colors",
   desc = "Modify color outlines for Lola",
@@ -29,6 +31,8 @@ SafeItemColor = Settings.user.color {
   id = "colors.safe"
 }
 
+function module.safeItemColor() return SafeItemColor end
+
 ClaimedItemColor = Settings.user.color {
   name = "Claimed items",
   desc = "Items Lola has claimed",
@@ -36,6 +40,8 @@ ClaimedItemColor = Settings.user.color {
   order = 1,
   id = "colors.claimed"
 }
+
+function module.claimedItemColor() return ClaimedItemColor end
 
 OtherClaimedItemColor = Settings.user.color {
   name = "Other players' claimed items",
@@ -45,6 +51,8 @@ OtherClaimedItemColor = Settings.user.color {
   id = "colors.other"
 }
 
+function module.otherClaimedItemColor() return OtherClaimedItemColor end
+
 ChanceItemColor = Settings.user.color {
   name = "Chance items",
   desc = "Items Lola has claimed (when only one of a group)",
@@ -52,6 +60,8 @@ ChanceItemColor = Settings.user.color {
   order = 3,
   id = "colors.chance"
 }
+
+function module.chanceItemColor() return ChanceItemColor end
 
 DangerItemColor = Settings.user.color {
   name = "Dangerous items",
@@ -61,6 +71,8 @@ DangerItemColor = Settings.user.color {
   id = "colors.danger"
 }
 
+function module.dangerItemColor() return DangerItemColor end
+
 DangerShrineColor = Settings.user.color {
   name = "Dangerous shrines",
   desc = "Shrines that will kill Lola upon contact",
@@ -68,6 +80,8 @@ DangerShrineColor = Settings.user.color {
   order = 4,
   id = "colors.dangerShrine"
 }
+
+function module.dangerShrineColor() return DangerShrineColor end
 
 Event.render.add("outlineClaimedItems", { order = "outlines", sequence = 1 },
   function(ev)
@@ -180,3 +194,5 @@ Event.render.add("outlineClaimedItems", { order = "outlines", sequence = 1 },
     end
   end
 )
+
+return module
