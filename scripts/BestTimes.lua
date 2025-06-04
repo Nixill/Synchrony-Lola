@@ -195,7 +195,7 @@ Event.menu.add("bestTimes", "Lola_bestTimes", function(ev)
   })
 
   ev.menu = {
-    label = "Lola Best Times",
+    label = "Lola Best Times" .. (ev.arg.noBeat and " (No beat)" or ""),
     entries = entries
   }
 end)
@@ -267,7 +267,7 @@ Event.menu.add("pbDetails", "Lola_pbDetails", function(ev)
 
   ev.menu = {
     entries = entries,
-    label = ev.arg.ruleset.name .. ev.arg.challenge.name
+    label = ev.arg.ruleset.name .. ev.arg.challenge.name .. (ev.arg.noBeat and " (No beat)" or "")
   }
 end)
 
