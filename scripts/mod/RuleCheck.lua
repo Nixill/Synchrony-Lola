@@ -30,11 +30,11 @@ end
 --     -- times are tracked separately.
 -- }
 function mod.getFollowedRules()
-  print("Rule check!")
-  print("Leaderboard context follows:")
+  -- print("Rule check!")
+  -- print("Leaderboard context follows:")
   local ctx = LeaderboardContext.getFinalRunContext()
   local out = {}
-  print(ctx)
+  -- print(ctx)
 
   if
     not ctx.completion.victory -- Only wins count
@@ -123,7 +123,7 @@ function mod.getFollowedRules()
 
   out.NoBeat = rules["gameplay.modifiers.rhythm"] == "NO_BEAT"
 
-  print(out)
+  -- print(out)
 
   return out
 end
