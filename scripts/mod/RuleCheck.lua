@@ -16,16 +16,18 @@ local function check(rules, rule, value, nillable)
 end
 
 -- Returns which rules were followed for the purposes of PBs and
--- achievements. The format is as follows. Note that values will either be
--- true or nil — an empty table will be returned if no rules were
--- followed.
+-- achievements. The format is as follows. An empty table can be returned
+-- if no rules were followed.
 -- {
 --   Any = true, -- if any of Default, Classic, or Lute are true.
 --   Default = true, -- if the Default Rules were followed.
 --   Classic = true, -- if the Classic Rules were followed.
 --   Lute = true, -- if the Lute Mode Rules were followed.
 --   NoRejects = true, -- if no items were rejected during the run.
---   Mystery = true -- if Mystery Mode was enabled during the run.
+--   Mystery = true, -- if Mystery Mode was enabled during the run.
+--   NoBeat = true -- if No Beat Mode was enabled during the run.
+--     -- Achievements may be earned with or without No Beat Mode, but
+--     -- times are tracked separately.
 -- }
 function mod.getFollowedRules()
   local ctx = LeaderboardContext.getFinalRunContext()
@@ -35,7 +37,7 @@ function mod.getFollowedRules()
     not ctx.completion.victory -- Only wins count
     or #ctx.characters > 1 or ctx.characters[1] ~= "Lola_Lola" -- Only solo Lola runs count
     or #ctx.customRules > 1 -- Runs don't count if rules change midway
-    or ctx.gameMode ~= "AllZones" -- Only All Zones runs count
+    or (ctx.gameMode ~= "AllZones" and ctx.gameMode ~= "WeeklyChallenge") -- Only All Zones or Weekly Challenge runs count
     or ctx.maximumPlayers > 1 -- Only singleplayer runs count
     or #ctx.mods > 1 -- Runs don't count if mods change midway
   then
@@ -47,7 +49,6 @@ function mod.getFollowedRules()
   if
     rules["gameplay.modifiers.dancepad"] -- Dance Pad mode doesn't count
     or rules["gameplay.modifiers.phasing"] -- Phasing mode doesn't count
-    or rules["gameplay.modifiers.rhythm"] == "NO_BEAT" -- No beat mode doesn't count
   then
     return {}
   end
@@ -59,6 +60,9 @@ function mod.getFollowedRules()
     and check(rules, "gameplay.glass", true, true)
     and check(rules, "gameplay.shrine", true, true)
     and check(rules, "gameplay.transaction", true, true)
+    -- gameplay.bounce is ignored; this achievement may be earned with
+    -- either value, for leniency purposes.
+    and check(rules, "gameplay.autoInteract", true, true)
     -- multiplayer.death is ignored; this achievement may be earned with
     -- either value. (That setting has no effect on singleplayer runs,
     -- which are a prerequisite for achievements anyway.)
@@ -74,10 +78,16 @@ function mod.getFollowedRules()
     and check(rules, "gameplay.glass", false)
     and check(rules, "gameplay.shrine", false)
     and check(rules, "gameplay.transaction", false)
+    and check(rules, "gameplay.bounce", false, true)
+    -- gameplay.autoInteract is ignored; this achievement may be earned
+    -- with either value. (That setting has no effect when Package Spell
+    -- does not exist.)
     -- multiplayer.death is ignored; this achievement may be earned with
     -- either value. (That setting has no effect on singleplayer runs,
     -- which are a prerequisite for achievements anyway.)
-    and check(rules, "silly.packageEnemies", false)
+    -- silly.packageEnemies is ignored; this achievement may be earned
+    -- with either value. (That setting has no effect when Package Spell
+    -- does not exist.)
     and check(rules, "silly.luteMode", false, true)
   )
 
@@ -88,6 +98,9 @@ function mod.getFollowedRules()
     and check(rules, "gameplay.glass", true, true)
     and check(rules, "gameplay.shrine", true, true)
     and check(rules, "gameplay.transaction", true, true)
+    -- gameplay.bounce is ignored; this achievement may be earned with
+    -- either value, for leniency purposes.
+    and check(rules, "gameplay.autoInteract", false)
     -- multiplayer.death is ignored; this achievement may be earned with
     -- either value. (That setting has no effect on singleplayer runs,
     -- which are a prerequisite for achievements anyway.)
@@ -104,6 +117,8 @@ function mod.getFollowedRules()
     or out.Classic
     or out.Lute
   )
+
+  out.NoBeat = rules["gameplay.modifiers.rhythm"] == "NO_BEAT"
 
   return out
 end

@@ -152,6 +152,10 @@ local function packageItems(ev, greater)
     ItemStorage.clear(package)
   end
 
+  if LoSettings.get("gameplay.autoInteract") and package.Lola_interactedBy then
+    package.Lola_interactedBy.playerID = ev.caster.controllable.playerID
+  end
+
   local text
   local sfp = ev.spell.Lola_spellcastFlyawayPackage
 

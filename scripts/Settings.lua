@@ -173,6 +173,24 @@ Settings.shared.bool {
   autoRegister = true
 }
 
+Settings.shared.bool {
+  name = "Bounce on attempted violation",
+  desc = "Does Lola bounce harmlessly off attempted item pickups or shrine usages?",
+  id = "gameplay.bounce",
+  order = 7,
+  default = false,
+  autoRegister = true
+}
+
+Settings.shared.bool {
+  name = "Automatically claim package interactions",
+  desc = "When Lola creates a package, should it automatically be marked as interacted?",
+  id = "gameplay.autoInteract",
+  order = 8,
+  default = true,
+  autoRegister = true
+}
+
 --#endregion Gameplay (section)
 
 Settings.group {

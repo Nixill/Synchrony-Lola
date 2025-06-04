@@ -131,7 +131,7 @@ Event.menu.add("guide", "Lola_guide", function(ev)
       height = 6
     },
     {
-      label = "- Items will be received in the order they were unpackaged.",
+      label = "- Items will be received in the order they were unpackaged. Later items override earlier items.",
       font = UI.Font.SMALL,
       height = 6
     },

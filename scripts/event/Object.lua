@@ -3,12 +3,16 @@ local Damage       = require "necro.game.system.Damage"
 local Descent      = require "necro.game.character.Descent"
 local Entities     = require "system.game.Entities"
 local Event        = require "necro.event.Event"
+local Flyaway      = require "necro.game.system.Flyaway"
 local GameDLC      = require "necro.game.data.resource.GameDLC"
+local GrooveChain  = require "necro.game.character.GrooveChain"
 local Inventory    = require "necro.game.item.Inventory"
 local ItemPickup   = require "necro.game.item.ItemPickup"
 local LowPercent   = require "necro.game.item.LowPercent"
+local Map          = require "necro.game.object.Map"
 local Object       = require "necro.game.object.Object"
 local RNG          = require "necro.game.system.RNG"
+local Sound        = require "necro.audio.Sound"
 local Utilities    = require "system.utils.Utilities"
 
 local ItemHolders   = require "Lola.mod.ItemHolders"
@@ -42,16 +46,32 @@ Event.objectInteract.add("shrineDeath",
     local target = ev.entity
 
     if source.Lola_forcedLowPercent and source.Lola_forcedLowPercent.active then
-      Object.die {
+      if not LoSettings.get("gameplay.bounce") then
+        Object.die {
+          entity = source,
+          killer = target,
+          killerName = source.Lola_forcedLowPercent.killerName,
+          damageType = Damage.Type.SELF_DESTRUCT
+          --     1 BYPASS_ARMOR
+          --     2 BYPASS_INVINCIBILITY
+          --     4 BYPASS_DEATH_TRIGGERS
+          --    64 SELF_DAMAGE
+          -- 16384 BYPASS_IMMUNITY
+        }
+      else
+        Sound.playIfFocused("error", source)
+      end
+
+      Flyaway.create {
+        text = "Shrine interactions forbidden!",
         entity = source,
-        killer = target,
-        killerName = source.Lola_forcedLowPercent.killerName,
-        damageType = Damage.Type.SELF_DESTRUCT
-        --     1 BYPASS_ARMOR
-        --     2 BYPASS_INVINCIBILITY
-        --     4 BYPASS_DEATH_TRIGGERS
-        --    64 SELF_DAMAGE
-        -- 16384 BYPASS_IMMUNITY
+        offsetY = -6
+      }
+
+      Flyaway.create {
+        text = "(but explosions aren't...)",
+        entity = source,
+        delay = 1
       }
 
       ev.suppressed = true
@@ -103,42 +123,78 @@ Event.objectTryCollectItem.add("itemDeath",
     local source = ev.entity
     local target = ev.item
 
-    -- The player should NOT die if:
+    -- The player should NOT die or bounce if:
     -- 1. We're in the lobby
     if CurrentLevel.isLobby()
       -- 2. The item pickup isn't successful
       or ev.result ~= ItemPickup.Result.SUCCESS
       -- 3. The player doesn't have forced low% active
       or not source.Lola_forcedLowPercent.active
-      -- 4. The target item doesn't negate low%
-      or not (target.itemNegateLowPercent
-        and target.itemNegateLowPercent.active)
-      -- 5. The player doesn't have a low% component
+      -- 4. The player doesn't have a low% component
       or not source.lowPercent
-      -- 6. The player's low% component explicitly allows the item
-      or source.lowPercent.allowedItems[target.name]
-      -- 7. The player's forced low% component explicitly allows the item
-      or source.Lola_forcedLowPercent.allowedItems[target.name]
-      -- 8. The player has held the item
-      or ItemHolders.check(target, source)
     then
+      return
+    end
+
+    local continue = false
+
+    -- But also, the item pickup should fail unless *EVERY* item on the tile:
+    for i, e in Map.entitiesWithComponent(target.position.x, target.position.y, "itemNegateLowPercent") do
+      -- 1. The target item doesn't negate low%
+      if not (not (e.itemNegateLowPercent
+            and e.itemNegateLowPercent.active)
+          -- 2. The player's low% component explicitly allows the item
+          or source.lowPercent.allowedItems[e.name]
+          -- 3. The player's forced low% component explicitly allows the item
+          or source.Lola_forcedLowPercent.allowedItems[e.name]
+          -- 4. The player has held the item
+          or ItemHolders.check(e, source)) then
+        continue = true
+      end
+    end
+
+    if not continue then
       return
     end
 
     ev.result = ItemPickup.Result.FAILURE
     ev.count = 0
 
-    Object.die {
+    local claimantPID = RevealedItems.check(target)
+    local flyawayText = ""
+
+    if (claimantPID) then
+      if (claimantPID == source.controllable.playerID) then
+        flyawayText = "Collect this item on the stairs!"
+      else
+        flyawayText = "Another player is collecting this item on the stairs!"
+      end
+    else
+      flyawayText = "Package and reveal this item!"
+    end
+
+    Flyaway.create {
+      text = flyawayText,
       entity = source,
-      killer = target,
-      killerName = source.Lola_forcedLowPercent.killerName,
-      damageType = Damage.Type.SELF_DESTRUCT
-      --     1 BYPASS_ARMOR
-      --     2 BYPASS_INVINCIBILITY
-      --     4 BYPASS_DEATH_TRIGGERS
-      --    64 SELF_DAMAGE
-      -- 16384 BYPASS_IMMUNITY
+      offsetY = -6
     }
+
+    if not LoSettings.get("gameplay.bounce") then
+      Object.die {
+        entity = source,
+        killer = target,
+        killerName = source.Lola_forcedLowPercent.killerName,
+        damageType = Damage.Type.SELF_DESTRUCT
+        --     1 BYPASS_ARMOR
+        --     2 BYPASS_INVINCIBILITY
+        --     4 BYPASS_DEATH_TRIGGERS
+        --    64 SELF_DAMAGE
+        -- 16384 BYPASS_IMMUNITY
+      }
+    else
+      Sound.playIfFocused("error", source)
+      GrooveChain.drop(source, GrooveChain.Type.IDLE)
+    end
   end
 )
 --#endregion

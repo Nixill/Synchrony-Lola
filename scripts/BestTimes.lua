@@ -56,6 +56,17 @@ TimesTable = Settings.user.table {
   }
 }
 
+TimesTableNoBeat = Settings.user.table {
+  id = "timesTableNoBeat",
+  visibility = Settings.Visibility.RESTRICTED,
+  default = {
+    Normal = {},
+    NoRejects = {},
+    Mystery = {},
+    NoRejectsMystery = {}
+  }
+}
+
 --#endregion Data Storage
 
 --------------
@@ -83,7 +94,17 @@ ViewTimes = Settings.user.action {
   id = "pb.view",
   order = 1,
   action = function()
-    Menu.open("Lola_bestTimes")
+    Menu.open("Lola_bestTimes", {})
+  end
+}
+
+ViewTimesNB = Settings.user.action {
+  name = "View no-beat times (Lola)",
+  desc = "View your best times with No Beat Mode in the Lola mod",
+  id = "pb.viewNoBeat",
+  order = 2,
+  action = function()
+    Menu.open("Lola_bestTimes", { noBeat = true })
   end
 }
 
@@ -130,13 +151,15 @@ Event.menu.add("bestTimes", "Lola_bestTimes", function(ev)
     { id = "NoRejectsMystery", name = ", No rejects, Mystery mode" }
   }
 
+  local timetable = ev.arg.noBeat and TimesTableNoBeat or TimesTable
+
   for _, c in ipairs(challenges) do
-    if TimesTable[c.id] then -- just in case, shouldn't ever be nil
+    if timetable[c.id] then -- just in case, shouldn't ever be nil
       for _, r in ipairs(rules) do
         local label = r.name .. c.name .. ": "
 
-        if TimesTable[c.id][r.id] then
-          label = label .. TimeFormat(TimesTable[c.id][r.id].Time)
+        if timetable[c.id][r.id] then
+          label = label .. TimeFormat(timetable[c.id][r.id].Time)
         else
           label = label .. "-"
         end
@@ -144,12 +167,13 @@ Event.menu.add("bestTimes", "Lola_bestTimes", function(ev)
         local entry = {
           id = r.id .. c.id,
           label = label,
-          enableIf = not not TimesTable[c.id][r.id],
+          enableIf = not not timetable[c.id][r.id],
           action = function()
             Menu.open("Lola_pbDetails", {
               challenge = c,
               ruleset = r,
-              info = TimesTable[c.id][r.id]
+              info = timetable[c.id][r.id],
+              noBeat = ev.arg.noBeat
             })
           end
         }
@@ -222,7 +246,11 @@ Event.menu.add("pbDetails", "Lola_pbDetails", function(ev)
               label = "Confirm delete",
               action = function()
                 Menu.close()
-                TimesTable[ev.arg.challenge.id][ev.arg.ruleset.id] = nil
+                if ev.arg.noBeat then
+                  TimesTableNoBeat[ev.arg.challenge.id][ev.arg.ruleset.id] = nil
+                else
+                  TimesTable[ev.arg.challenge.id][ev.arg.ruleset.id] = nil
+                end
                 Menu.update()
               end
             }
@@ -249,11 +277,12 @@ end)
 -- Run completed event --
 --#region----------------
 
-local function trySaveScore(ruleset, challenge)
-  local challengeBoard = TimesTable[challenge]
+local function trySaveScore(ruleset, challenge, noBeat)
+  local timetable = noBeat and TimesTableNoBeat or TimesTable
+  local challengeBoard = timetable[challenge]
   if not challengeBoard then
-    TimesTable[challenge] = {}
-    challengeBoard = TimesTable[challenge]
+    timetable[challenge] = {}
+    challengeBoard = timetable[challenge]
   end
 
   local prevEntry = challengeBoard[ruleset]
@@ -286,23 +315,24 @@ Event.runComplete.add("unlockLolaAchievement", { order = "leaderboardSubmission"
   if not SaveTimes then return end
 
   local followedRules = RuleCheck.getFollowedRules()
+  local noBeat = followedRules.NoBeat
 
   if followedRules.Any then
     local ruleset = followedRules.Default and "Default" or followedRules.Classic and "Classic" or "Lute"
 
     if followedRules.Mystery then
-      trySaveScore(ruleset, "Mystery")
+      trySaveScore(ruleset, "Mystery", noBeat)
 
       if followedRules.NoRejects then
-        trySaveScore(ruleset, "NoRejectsMystery")
+        trySaveScore(ruleset, "NoRejectsMystery", noBeat)
       end
     end
 
     if followedRules.NoRejects then
-      trySaveScore(ruleset, "NoRejects")
+      trySaveScore(ruleset, "NoRejects", noBeat)
     end
 
-    trySaveScore(ruleset, "Normal")
+    trySaveScore(ruleset, "Normal", noBeat)
   end
 end)
 

@@ -94,6 +94,27 @@ function module.unmark(item)
   return pid
 end
 
+-- Checks the reveal state of an item. Returns false if the item is
+-- unclaimed, otherwise the PID of the player that has claimed it. nil is
+-- returned if the call fails.
+--
+-- item may be passed as an entity table or ID.
+function module.check(item)
+  if type(item) == "number" then item = Entities.getEntityByID(item) end
+
+  if not (item and item.Lola_revealedBy) then
+    return nil
+  end
+
+  local pid = item.Lola_revealedBy.playerID
+
+  if pid == 0 then
+    return false
+  else
+    return pid
+  end
+end
+
 -- Return a table of all items a player has marked as revealed. This
 -- returns the item entity tables, not just the IDs.
 --
