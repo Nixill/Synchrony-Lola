@@ -1,5 +1,7 @@
+local Entities     = require "system.game.Entities"
 local Event        = require "necro.event.Event"
 local Menu         = require "necro.menu.Menu"
+local PlayerList   = require "necro.client.PlayerList"
 local Settings     = require "necro.config.Settings"
 local SettingsMenu = require "necro.menu.settings.SettingsMenu"
 local TextFormat   = require "necro.config.i18n.TextFormat"
@@ -12,7 +14,8 @@ ShowInPauseMenu = Settings.user.bool {
   desc = "Whether or not the \"Guide to Lola\" should be shown in the pause menu.",
   order = 4,
   id = "showGuideInPauseMenu",
-  default = true
+  default = true,
+  setter = Menu.updateAll
 }
 
 ShowNow = Settings.user.action {
@@ -27,11 +30,18 @@ ShowNow = Settings.user.action {
   end
 }
 
+local function localPlayerIsLola()
+  local localChar = PlayerList.getCharacter(PlayerList.getLocalPlayerID())
+  if localChar then return localChar.name == "Lola_Lola" end
+
+  if (#Entities.getEntitiesByType("Lola_Lola") >= 1) then return true end
+end
+
 Event.menu.override("pause", 1, function(func, ev)
   -- Run regular menu event first
   func(ev)
 
-  if ShowInPauseMenu then
+  if ShowInPauseMenu and localPlayerIsLola() then
     table.insert(ev.menu.entries, 2, {
       id = "Lola_help",
       label = "Guide to Lola",
@@ -146,6 +156,7 @@ Event.menu.add("guide", "Lola_guide", function(ev)
       font = UI.Font.SMALL,
       height = 6
     },
+    SettingsMenu.createEntry("mod.Lola.showGuideInPauseMenu"),
     {
       label = "Back",
       action = Menu.close

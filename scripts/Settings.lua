@@ -22,6 +22,13 @@ local function setPreset(values)
   end
 end
 
+local function presetSetter(values)
+  return function()
+    setPreset(values)
+    Menu.close()
+  end
+end
+
 --#endregion ACTIONS
 
 ----------------
@@ -69,10 +76,7 @@ Settings.shared.action {
   id = "preset.default",
   desc = "Lola's default rules",
   order = 0,
-  action = function()
-    setPreset {}
-    Menu.close()
-  end,
+  action = presetSetter {},
   autoRegister = true
 }
 
@@ -81,20 +85,38 @@ Settings.shared.action {
   id = "preset.classic",
   desc = "Classic rules: Nix's first clear",
   order = 1,
-  action = function()
-    setPreset {
-      ["mod.Lola.gameplay.package"] = LoEnum.PackageSetting.NONE,
-      ["mod.Lola.gameplay.bombs"] = 3,
-      ["mod.Lola.gameplay.storageVision"] = false,
-      ["mod.Lola.gameplay.glass"] = false,
-      ["mod.Lola.gameplay.shrine"] = false,
-      ["mod.Lola.gameplay.transaction"] = false,
-      ["mod.Lola.multiplayer.death"] = true,
-      ["mod.Lola.silly.packageEnemies"] = false
-    }
-    Menu.close()
-  end,
+  action = presetSetter {
+    ["mod.Lola.gameplay.package"] = LoEnum.PackageSetting.NONE,
+    ["mod.Lola.gameplay.bombs"] = 3,
+    ["mod.Lola.gameplay.storageVision"] = false,
+    ["mod.Lola.gameplay.glass"] = false,
+    ["mod.Lola.gameplay.shrine"] = false,
+    ["mod.Lola.gameplay.transaction"] = false,
+    ["mod.Lola.multiplayer.death"] = true,
+    ["mod.Lola.silly.packageEnemies"] = false
+  },
   autoRegister = true
+}
+
+Settings.shared.action {
+  name = "Lute Mode",
+  id = "preset.lute",
+  desc = "Lola's default rules, but with Lute Mode enabled",
+  order = 2,
+  action = presetSetter {
+    ["mod.Lola.silly.luteMode"] = true
+  }
+}
+
+Settings.shared.action {
+  name = "Easy mode",
+  id = "preset.easy",
+  desc = "As easy as the custom rules allow",
+  order = 3,
+  action = presetSetter {
+    ["mod.Lola.gameplay.bombs"] = 5,
+    ["mod.Lola.gameplay.bounce"] = true
+  }
 }
 
 --#endregion Presets

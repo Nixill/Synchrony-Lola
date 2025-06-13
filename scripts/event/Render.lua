@@ -77,7 +77,7 @@ DangerShrineColor = Settings.user.color {
   name = "Dangerous shrines",
   desc = "Shrines that will kill Lola upon contact",
   default = Color.rgba(180, 43, 66, 255),
-  order = 4,
+  order = 5,
   id = "colors.dangerShrine"
 }
 
