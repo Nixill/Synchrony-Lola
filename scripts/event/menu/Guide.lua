@@ -1,6 +1,7 @@
 local Entities     = require "system.game.Entities"
 local Event        = require "necro.event.Event"
 local Menu         = require "necro.menu.Menu"
+local Player       = require "necro.game.character.Player"
 local PlayerList   = require "necro.client.PlayerList"
 local Settings     = require "necro.config.Settings"
 local SettingsMenu = require "necro.menu.settings.SettingsMenu"
@@ -31,8 +32,8 @@ ShowNow = Settings.user.action {
 }
 
 local function localPlayerIsLola()
-  local localChar = PlayerList.getCharacter(PlayerList.getLocalPlayerID())
-  if localChar then return localChar.name == "Lola_Lola" end
+  local localChar = Player.getCharacterType(PlayerList.getLocalPlayerID())
+  if localChar then return localChar == "Lola_Lola" end
 
   if (#Entities.getEntitiesByType("Lola_Lola") >= 1) then return true end
 end
